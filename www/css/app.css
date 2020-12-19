@@ -84,4 +84,48 @@
 	font-family: 'Poppins', Arial, sans-serif;
 }
 
+/* GENERAL */
 
+.justify-content-center{
+  justify-content: center;
+}
+
+.oculto{
+  display: none;
+}
+
+.imagenYTexto{
+  align-items: center;
+  justify-content: center;
+}
+
+/* Primer inicio */
+.elegirCarreraTitulo {
+  margin-top: 30px;
+}
+
+.elegirCarreraTitulo .f7-icons{
+  font-size: 22px;
+}
+
+.listaPrimerInicio{
+  margin:0;
+}
+
+#botonPrimerInicio {
+  margin-top: 50px;
+}
+
+/* HOME */
+
+.range-slider{
+  pointer-events: none;
+}
+
+#iconoCorredor{
+  position: absolute;
+}
+
+#contenedorCorredor{
+  height: 20px;
+}

@@ -1,0 +1,61 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="cargarMaterias">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h1 class="text-align-center">Cargar materia</h1>
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info" >
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nombre</div>
+                                <div class="item-input-wrap">
+                                    <input id="adminNombreMateria" type="text" placeholder="Nombre materia">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" >
+                            <div class="item-inner">
+                                <div class="item-title item-label">Año</div>
+                                <div class="item-input-wrap">
+                                    <input id="adminAnio" type="number" placeholder="Año">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Tiene correlativas?</div>
+                                <div class="item-input-wrap input-dropdown-wrap">
+                                    <select id="adminCorrelativa">
+                                        <option value="no">No</option>
+                                        <option value="si">Si</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <a class="item-link smart-select smart-select-init" data-open-in="popup"  data-searchbar="true">
+                                <select id="adminListaCorrelativas" multiple>
+                                </select>
+                              <div class="item-content">
+                                <div class="item-inner">
+                                  <div class="item-title">Materias correlativas</div>
+                                </div>
+                              </div>
+                            </a>
+                          </li>
+                        
+                    </ul>
+                    <p id="adminMensaje"></p>
+                </div>
+                <button id="adminSubirMateria" class="button button-fill">Subir materia</button>
+                
+            </div>
+        </div>
+    </div>
+</div>

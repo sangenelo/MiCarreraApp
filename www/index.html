@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <!--
         Customize this policy to fit your own app's needs. For more guidance, see:
@@ -10,11 +11,12 @@
             * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
                 * Enable inline JS: add 'unsafe-inline' to default-src
         -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *">
+    <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *">-->
 
     <!-- Required meta tags-->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <!-- Color theme for statusbar -->
     <meta name="theme-color" content="#2196f3">
@@ -26,66 +28,78 @@
     <link rel="stylesheet" href="css/icons.css">
     <!-- Path to your custom app styles-->
     <link rel="stylesheet" href="css/app.css">
+    <!-- Fontawesome icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
 </head>
 
-<body>
+<body class="color-theme-green">
     <div id="app">
-        <!-- Statusbar overlay -->
-        <div class="statusbar"></div>
-    
+        <!-- Appbar -->
+        <div class="appbar">
+            <div class="appbar-inner">
+                <div class="left">
+                    <div class="menuIconContenedor">
+                        <a href="#" class="button button-small panel-toggle display-flex" data-panel="left">
+                            <i class="f7-icons">bars</i>
+                        </a>
+                    </div>
+                    <div class="botonAtras oculto">
+                        <a href="#" class="link back">
+                            <i class="icon icon-back"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="right">
+                    <p>Mi Carrera</p>
+                </div>
+            </div>
+        </div>
+        <!-- Panel -->
+        <div class="panel panel-left panel-reveal panel-resizable panel-init">
+            <div class="block">
+              <p>Left Panel content here</p>
+              <p><a class="panel-close" href="#">Close me</a></p>
+              <p><a class="panel-open" href="#" data-panel=".panel-right-1">Open Right Panel</a></p>
+            </div>
+          </div>
         <!-- Your main view, should have "view-main" class -->
         <div class="view view-main">
             <!-- Initial Page, "data-name" contains page name -->
             <div data-name="index" class="page">
-    
-                <!-- Top Navbar -->
-                <div class="navbar">
-                    <div class="navbar-bg"></div>
-                    <div class="navbar-inner">
-                        <div class="left"><i class="icon icon-back"></i></div>
-                        <div class="title">Page Title</div>
-                        <div class="right"><i class="icon icon-forward"></i></div>
-                    </div>
-                </div>
-        
-                <!-- Toolbar -->
-                <div class="toolbar toolbar-bottom">
-                    <div class="toolbar-inner">
-                    <!-- Toolbar links -->
-                    <a href="#" class="link">Link 1</a>
-                    <a href="#" class="link">Link 2</a>
-                    </div>
-                </div>
-        
                 <!-- Scrollable page content -->
-                <div class="page-content">
-                    <div class="block">
-                        <p>Page content goes here</p>
-                        <!-- Link to another page -->
-                        <a href="/about/" data-view=".page-content">About app</a>
-
-                        <!-- In data-popup attribute we specify CSS selector of popup we need to open -->
-                        <p><a href="#" data-popup=".my-popup" class="popup-open">Open Popup</a></p>
-
-                        <!-- And somewhere in DOM -->
-                        <div class="popup my-popup">
-                            <div class="view">
-                                <div class="page">
-                                    <div class="navbar">
-                                        <div class="navbar-bg"></div>
-                                        <div class="navbar-inner">
-                                            <div class="title">Popup</div>
-                                            <div class="right">
-                                                <!-- Link to close popup -->
-                                                <a class="link popup-close">Close</a>
+                <div class="page-content login-screen-content">
+                    <div class="row justify-content-center">
+                        <div class="col-80">
+                            <h1 class="text-align-center">Iniciar Sesión</h1>
+                            <div class="list">
+                                <ul>
+                                    <li class="item-content item-input item-input-with-info" id="loginEmailContainer">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Mail</div>
+                                            <div class="item-input-wrap">
+                                                <input id="emailIngresado" type="email" placeholder="midirección@mail.com">
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-error-message">Email inválido</div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="page-content">
-                                      ...
-                                    </div>
-                                </div>
+                                    </li>
+                                    <li class="item-content item-input ">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Contraseña</div>
+                                            <div class="item-input-wrap">
+                                                <input id="passwordIngresado" type="password" placeholder="Ingrese su contraseña">
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+
                             </div>
+                            <p id="mensajeDeErrorLogin"></p>
+                            <button id="botonInicioSesion" class="button button-fill">Iniciar sesión</button>
+                            <p class="text-align-center">¿Primera vez?<a href="/registrarse/"> Registrate acá</a></p>
+                            <p class="text-align-center"><a  href="/cargarMaterias/">Olvidé mi contraseña</a></p>
+                            
                         </div>
                     </div>
                 </div>
@@ -97,6 +111,36 @@
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="lib/framework7/js/framework7.bundle.min.js"></script>
     <script type="text/javascript" src="js/my-app.js"></script>
+    <!-- Mis JS -->
+    <script type="text/javascript" src="js/loginYRegistro.js"></script>
+    <script type="text/javascript" src="js/universidadesCarrerasMaterias.js"></script>
+    <script type="text/javascript" src="js/admin.js"></script>
+
+    <!-- FIREBASE -->
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyAYS4qRLw3ELZVFDxDXiUpLH9qiGllOuhY",
+            authDomain: "micarrera-4c1fc.firebaseapp.com",
+            projectId: "micarrera-4c1fc",
+            storageBucket: "micarrera-4c1fc.appspot.com",
+            messagingSenderId: "887817942640",
+            appId: "1:887817942640:web:3636c5761b42c1b3dfa6b5"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
 </body>
 
 </html>

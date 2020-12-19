@@ -1,0 +1,68 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="registrarse">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h1 class="text-align-center">Registrarse</h1>
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info" id="registroEmailContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Mail</div>
+                                <div class="item-input-wrap">
+                                    <input id="emailIngresadoRegistro" type="email" placeholder="midirección@mail.com">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">Email inválido</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="registroPasswordContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Contraseña</div>
+                                <div class="item-input-wrap">
+                                    <input id="passwordIngresadoRegistro" type="password" placeholder="Ingresá tu contraseña">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">La contraseña debe contener al menos 6 caracteres.</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="registroPasswordContainer2">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Repetí tu contraseña</div>
+                                <div class="item-input-wrap">
+                                    <input id="passwordIngresadoRegistro2" type="password" placeholder="Por favor, repetí tu contraseña">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">Las contraseñas deben coincidir.</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="registroNombreContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nombre</div>
+                                <div class="item-input-wrap">
+                                    <input id="nombreIngresadoRegistro" type="text" placeholder="Ingresá tu nombre">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">No se admiten caracteres especiales.</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="registroApellidoContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Apellido</div>
+                                <div class="item-input-wrap">
+                                    <input id="apellidoIngresadoRegistro" type="text" placeholder="Ingresá tu apellido">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">No se admiten caracteres especiales.</div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+                <p id="mensajeDeErrorRegistro"></p>
+                <button id="botonRegistro" class="button button-fill">Registrarme</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
