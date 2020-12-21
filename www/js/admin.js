@@ -4,6 +4,7 @@ function adminSubirMateria() {
     var anioMateria = $$('#adminAnio').val();
     var tieneCorrelativas = $$('#adminCorrelativa').val();
     //console.log(nombreMateria,anioMateria,tieneCorrelativas);
+    anioMateria = parseInt(anioMateria);
 
     if (tieneCorrelativas == "si") {
         var requiereCorrelativas = true;

@@ -1,49 +1,35 @@
 <!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
 <div class="page" data-name="listadoMaterias">
-    <div class="page-content">
-        <div class="row justify-content-center">
-            <h2 id="bienvenidoHome"></h2>
-            <div class="col">
-                <div class="list">
-                    <ul>
-                        <li class="item-content item-input">
-                            <div class="item-inner">
-                                <div class="item-title item-label">Carrera</div>
-                                <div class="item-input-wrap input-dropdown-wrap">
-                                    <select id="selectorCarreraHome">
-                                    </select>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+
+  <div class="page-content">
+    <div class="row justify-content-center">
+      <!--<h2 id="listadomateriasMateriasAprobadas">Materias aprobadas</h2>-->
+      <div class="col">
+        <div class="block-title">Materias aprobadas</div>
+        <div class="list">
+          <ul id="listaMateriasAprobadas">
+
+            <li>
+              <a href="#" class="item-link item-content">
+
+                <div class="item-inner">
+                  <div class="item-title">
+                    Inglés 1
+                    <div class="item-footer">Nota: 10</div>
+                  </div>
+                  <div class="item-after"><i class="f7-icons">square_pencil</i></div>
                 </div>
-                
-                <div class="list simple-list">
-                    <ul>
-                        <div id="contenedorCorredor" class="row">
-                            <div class="col-100">
-                                <i id="iconoCorredor" class="fas fa-running"></i>
-                            </div>
-                        </div>
-                        <li>
-                            <div class="item-cell width-auto flex-shrink-0">
-                               
-                            </div>
-                            <div class="item-cell flex-shrink-3">
-                                <!-- range slider -->
-                                <div class="range-slider range-slider-init">
-                                    <input type="range" min="0" max="100" step="1" value="0">
-                                </div>
-                            </div>
-                            <div class="item-cell width-auto flex-shrink-0">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                        </li>
-                    </ul>
-                    <p class="text-align-center" id="detalleProgreso"></p>
-                </div>
-                
-            </div>
+              </a>
+            </li>
+
+          </ul>
         </div>
+        <div class="block-title">Materias pendientes</div>
+        <div class="list" id="listaMateriasPendientes">
+          
+        </div>
+
+      </div>
     </div>
+  </div>
 </div>

@@ -34,6 +34,10 @@ var app = new Framework7({
     {
       path: '/listadoMaterias/',
       url: 'listadoMaterias.html'
+    },
+    {
+      path: '/agregarMateria/',
+      url: 'agregarMateria.html'
     }
   ]
   // ... other parameters
@@ -45,6 +49,7 @@ var mainView = app.views.create('.view-main');
 var baseDeDatos;
 var usuario;
 var nombre;
+var carreraSeleccionada;
 
 // Handle Cordova Device Ready Event
 $$(document).on('deviceready', function () {
@@ -91,6 +96,9 @@ $$(document).on('page:init', '.page[data-name="primerInicio"]', function (e) {
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
   console.log(usuario);
   cargarCarrerasDelUsuario();
+  $$('#botonHomeListadoMaterias').on('click', function () {
+    mainView.router.navigate('/listadoMaterias/');
+  })
 })
 
 $$(document).on('page:init', '.page[data-name="cargarMaterias"]', function (e) {
@@ -101,6 +109,30 @@ $$(document).on('page:init', '.page[data-name="cargarMaterias"]', function (e) {
 
 })
 
-$$(document).on('page:reinit', '.page[data-name="listadoMaterias"]', function (e) {
+$$(document).on('page:init', '.page[data-name="listadoMaterias"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+  listarMaterias();
+})
 
+$$(document).on('page:beforeout', '.page[data-name="listadoMaterias"]', function (e) {
+  $$('.botonAtras').addClass('oculto');
+  $$('.menuIconContenedor').removeClass('oculto');
+})
+
+$$(document).on('page:init', '.page[data-name="agregarMateria"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+  cargarMateriasPendientesEnAgregarMateria();
+  var calendarDefault = app.calendar.create({
+    inputEl: '#demo-calendar-default',
+  });
+  $$('#agregarMateriaAprobada').on('click', function () {
+    validarMateriaAprobada();
+  })
+})
+
+$$(document).on('page:beforeout', '.page[data-name="agregarMateria"]', function (e) {
+  $$('.botonAtras').addClass('oculto');
+  $$('.menuIconContenedor').removeClass('oculto');
 })

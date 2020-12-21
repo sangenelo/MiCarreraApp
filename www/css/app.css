@@ -129,3 +129,20 @@
 #contenedorCorredor{
   height: 20px;
 }
+
+/* AGREGAR MATERIA */
+
+#contenedorNombreMateria{
+  padding: 0;
+}
+
+#contenedorNombreMateria .item-after{
+  margin:0 !important;
+  padding: 0 !important;
+}
+
+/* LISTADO MATERIAS */
+
+.headerAnioMateriaPendiente{
+  margin-top: 10px !important;
+}
