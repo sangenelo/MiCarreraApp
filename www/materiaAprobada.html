@@ -1,0 +1,44 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="materiaAprobada">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h2 id="materiaAprobadaNombreMateria" class="text-align-center"></h2>
+                <div class="list">
+                    <ul>
+                        <input type="hidden" id="materiaAprobadaIdMateria" value="">
+                        
+                        <li class="item-content item-input item-input-with-info"  id="agregarMateriaSeleccionarFechaContenedor">
+                            
+                              <div class="item-inner">
+                                <div class="item-title item-label">Fecha de aprobación</div>
+                                <div class="item-input-wrap">
+                                  <input type="text" placeholder="¿Cuándo aprobaste?" readonly="readonly" id="materiaAprobadaFecha"/>
+                                  <span class="input-clear-button"></span>
+                                <div class="item-input-error-message">Tenés que ingresar una fecha.</div>
+                                </div>
+                              </div>
+                            
+                          </li>
+                        <li class="item-content item-input item-input-with-info" id="agregarMateriaNotaContenedor">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nota</div>
+                                <div class="item-input-wrap">
+                                    <input id="materiaAprobadaNota" min="4" max="10" type="number" placeholder="Ingrese la nota (Entre 4 y 10)">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">La nota debe estar entre 4 y 10</div>
+                                </div>
+                            </div>
+                        </li>
+                       
+
+
+                    </ul>
+                    <p id="adminMensaje"></p>
+                </div>
+                <button id="actualizarMateriaAprobada" class="button button-fill ">Actualizar materia</button>
+                <button id="quitarMateriaAprobada" class="button button-fill color-red margin-top">Quitar materia</button>
+            </div>
+        </div>
+    </div>
+</div>

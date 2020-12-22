@@ -36,12 +36,16 @@ var app = new Framework7({
       url: 'listadoMaterias.html'
     },
     {
-      path: '/agregarMateria/',
+      path: '/agregarMateria/:materia/',
       url: 'agregarMateria.html'
     },
     {
-      path: '/materiaPendiente/:nombreMateria/:correlativas/',
+      path: '/materiaPendiente/:idMateria/:nombreMateria/:correlativas/',
       url: 'materiaPendiente.html'
+    },
+    {
+      path: '/materiaAprobada/:idMateria/:nombreMateria/:nota/:fecha/',
+      url: 'materiaAprobada.html'
     }
   ]
   // ... other parameters
@@ -139,10 +143,13 @@ $$(document).on('page:beforeout', '.page[data-name="listadoMaterias"]', function
   $$('.menuIconContenedor').removeClass('oculto');
 })
 
+var materiaPasadaPorRuta;
+
 $$(document).on('page:init', '.page[data-name="agregarMateria"]', function (e) {
   $$('.botonAtras').removeClass('oculto');
   $$('.menuIconContenedor').addClass('oculto');
-  cargarMateriasPendientesEnAgregarMateria();
+  materiaPasadaPorRuta = app.view.main.router.currentRoute.params.materia;
+  cargarMateriasPendientesEnAgregarMateria(materiaPasadaPorRuta);
   var calendarDefault = app.calendar.create({
     inputEl: '#demo-calendar-default',
   });
@@ -150,6 +157,8 @@ $$(document).on('page:init', '.page[data-name="agregarMateria"]', function (e) {
     validarMateriaAprobada();
   })
 })
+
+
 
 $$(document).on('page:beforeout', '.page[data-name="agregarMateria"]', function (e) {
   $$('.botonAtras').addClass('oculto');
@@ -159,15 +168,53 @@ $$(document).on('page:beforeout', '.page[data-name="agregarMateria"]', function 
 $$(document).on('page:beforein', '.page[data-name="materiaPendiente"]', function (e) {
   $$('.botonAtras').removeClass('oculto');
   $$('.menuIconContenedor').addClass('oculto');
+  var idMateriaRuta='';
 })
 
 $$(document).on('page:init', '.page[data-name="materiaPendiente"]', function (e) {
   var materiasCorrelativasRestantes = app.view.main.router.currentRoute.params.correlativas;
   var nombreMateria = app.view.main.router.currentRoute.params.nombreMateria;
+  idMateriaRuta = app.view.main.router.currentRoute.params.idMateria;
   mostrarDatosMateriaPendiente(nombreMateria,materiasCorrelativasRestantes);
 
   $$('body').on('click', '#irAAgregarMateria', function () {
-   mainView.router.navigate('/agregarMateria/');
+   mainView.router.navigate('/agregarMateria/'+idMateriaRuta+'/');
+  });
+})
+
+$$(document).on('page:beforein', '.page[data-name="materiaAprobada"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+  var idMateriaAprobadaRuta='';
+  var nombreMateriaAprobada='';
+  var fechaMateriaAprobada='';
+  var notaMateriaAprobada='';
+})
+
+$$(document).on('page:init', '.page[data-name="materiaAprobada"]', function (e) {
+  idMateriaAprobadaRuta = app.view.main.router.currentRoute.params.idMateria;
+  nombreMateriaAprobada = app.view.main.router.currentRoute.params.nombreMateria;
+  fechaMateriaAprobada = app.view.main.router.currentRoute.params.fecha;
+  notaMateriaAprobada = app.view.main.router.currentRoute.params.nota;
+  
+  var calendarDefault = app.calendar.create({
+    inputEl: '#materiaAprobadaFecha',
+    value:[fechaMateriaAprobada]
+  });
+  
+ 
+  $$('#materiaAprobadaNombreMateria').text(nombreMateriaAprobada);
+  $$('#materiaAprobadaNota').val(notaMateriaAprobada);
+  $$('#materiaAprobadaIdMateria').val(idMateriaAprobadaRuta);
+
+  $$('#actualizarMateriaAprobada').on('click', function () {
+    validarActualizacionMateriaAprobada();
+  })
+
+  $$('#quitarMateriaAprobada').on('click', function () {
+    app.dialog.confirm('La materia pasará a Materias Pendientes', '¿Estás seguro?',function () {
+      moverMateriaDeAprobadasAPendientes();
+    });
   });
 })
 
