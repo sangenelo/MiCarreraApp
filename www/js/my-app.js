@@ -106,6 +106,10 @@ $$(document).on('page:init', '.page[data-name="cargarMaterias"]', function (e) {
   $$('#adminSubirMateria').on('click', function () {
     adminSubirMateria();
   })
+  
+  $$('#obtenerCorrelativas').on('click', function () {
+    obtenerCorrelativas();
+  })
 
 })
 

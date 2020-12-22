@@ -403,32 +403,35 @@ function listarMaterias(){
                     if(materias[i].requiereCorrelativas==true){
                         var todasAprobadas=true;
                         var materiaEncontrada;
-                        codigoHTMLLista+='<li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">Correlativas:';
+                        var listaCorrelativas="";
+                        
                         for(j=0;j<materias[i].esCorrelativaDe.length;j++){
                             
                             materiaEncontrada=false;
                             for(var k=0;k<doc.data().carreras[indice].materiasAprobadas.length;k++){
-                                if(materias[i].esCorrelativaDe[j]==doc.data().carreras[indice].materiasAprobadas[k].idMateria){
+                                if(materias[i].esCorrelativaDe[j]==doc.data().carreras[indice].materiasAprobadas[k].nombreMateria){
                                     materiaEncontrada=true;
-                                    break;
+                                    break;  
                                 }
                             }
                             if(materiaEncontrada==false){
                                 //Si la correlativa no fue encontrada en la lista de materias aprobadas, se lista
                                 todasAprobadas=false;
-                                codigoHTMLLista+=materias[i].esCorrelativaDe[j];
+                                listaCorrelativas+=materias[i].esCorrelativaDe[j]+'|';
                             }
                         }
                         if(todasAprobadas==true){
                             //Si todas las correlativas fueron encontradas, se muestra Todas aprobadas.
-                            codigoHTMLLista+=' Todas aprobadas.';
+                            codigoHTMLLista+='<li><a href="/materiaPendiente/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
+                        }else{
+
+                            codigoHTMLLista+='<li class="disabled"><a href="/materiaPendiente/'+listaCorrelativas+'/" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">Correlativas restantes: '+listaCorrelativas+'</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
                         }
-                        codigoHTMLLista+='</div></div></div></a></li>';
 
                         
 
                     }else{
-                        codigoHTMLLista+='<li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">correlativas: No tiene</div></div></div></a></li>';
+                        codigoHTMLLista+='<li><a href="/materiaPendiente/no/" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">Correlativas: No tiene</div></div></div></a></li>';
                     }
                    
                    

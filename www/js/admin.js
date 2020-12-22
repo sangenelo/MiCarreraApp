@@ -9,13 +9,13 @@ function adminSubirMateria() {
     if (tieneCorrelativas == "si") {
         var requiereCorrelativas = true;
         var disponible = false;
-        var correlativas=$$('#adminListaCorrelativas').val();
+        var correlativas = $$('#adminListaCorrelativas').val();
         datos = {
             nombre: nombreMateria,
             anio: anioMateria,
             disponible: disponible,
             requiereCorrelativas: requiereCorrelativas,
-            esCorrelativaDe:correlativas
+            esCorrelativaDe: correlativas
         }
     } else {
         var requiereCorrelativas = false;
@@ -30,7 +30,7 @@ function adminSubirMateria() {
 
     baseDeDatos = firebase.firestore();
     referenciaMateria = baseDeDatos.collection('Materias');
-   
+
 
     var refIdMateria = referenciaMateria.doc();
     var idMateria = refIdMateria.id;
@@ -38,14 +38,14 @@ function adminSubirMateria() {
         .then(function () {
             $$('#adminMensaje').append("Materia cargada correctamente.");
             referenciaMateriaDeLaCarrera = baseDeDatos.collection('Carreras').doc('UJ8sQSdxEZRGbuCWH1oM').collection('materias');
-            
+
             datosMateriaDeLaCarrera = {
                 idMateria: idMateria,
                 nombre: nombreMateria
             }
             referenciaMateriaDeLaCarrera.doc().set(datosMateriaDeLaCarrera)
                 .then(function () {
-                    $$('#adminMensaje').append("Materia cargada a la carrera correctamente. Id Materia: "+idMateria);
+                    $$('#adminMensaje').append("Materia cargada a la carrera correctamente. Id Materia: " + idMateria);
                     cargarListaCorrelatividades("UJ8sQSdxEZRGbuCWH1oM");
                 })
 
@@ -61,7 +61,7 @@ function adminSubirMateria() {
 
 }
 
-function cargarListaCorrelatividades(idCarrera){
+function cargarListaCorrelatividades(idCarrera) {
     $$('#adminListaCorrelativas').empty();
     baseDeDatos = firebase.firestore();
     var refCarreras = baseDeDatos.collection("Carreras").doc(idCarrera).collection("materias");
@@ -69,6 +69,21 @@ function cargarListaCorrelatividades(idCarrera){
         .then(function (querySnapshot) {
             querySnapshot.forEach(function (doc) {
                 $$('#adminListaCorrelativas').append('<option value="' + doc.data().idMateria + '">' + doc.data().nombre + '</option>')
+            });
+        })
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
+}
+
+function obtenerCorrelativas() {
+    baseDeDatos = firebase.firestore();
+    var refMaterias = baseDeDatos.collection("Materias");
+    refMaterias.get()
+        .then(function (querySnapshot) {
+            querySnapshot.forEach(function (doc) {
+               //console.log(doc.id + ";"+doc.data().nombre);
+               $$('#correlativasResultado').append(doc.id+';'+doc.data().nombre+'<br>');
             });
         })
         .catch(function (error) {
