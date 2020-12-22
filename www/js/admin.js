@@ -68,7 +68,7 @@ function cargarListaCorrelatividades(idCarrera) {
     refCarreras.get()
         .then(function (querySnapshot) {
             querySnapshot.forEach(function (doc) {
-                $$('#adminListaCorrelativas').append('<option value="' + doc.data().idMateria + '">' + doc.data().nombre + '</option>')
+                $$('#adminListaCorrelativas').append('<option value="' + doc.data().nombre + '">' + doc.data().nombre + '</option>')
             });
         })
         .catch(function (error) {
@@ -76,18 +76,5 @@ function cargarListaCorrelatividades(idCarrera) {
         });
 }
 
-function obtenerCorrelativas() {
-    baseDeDatos = firebase.firestore();
-    var refMaterias = baseDeDatos.collection("Materias");
-    refMaterias.get()
-        .then(function (querySnapshot) {
-            querySnapshot.forEach(function (doc) {
-               //console.log(doc.id + ";"+doc.data().nombre);
-               $$('#correlativasResultado').append(doc.id+';'+doc.data().nombre+'<br>');
-            });
-        })
-        .catch(function (error) {
-            console.log("Error getting documents: ", error);
-        });
-}
+
 

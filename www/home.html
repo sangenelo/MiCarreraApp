@@ -2,56 +2,75 @@
 <div class="page" data-name="home">
     <div class="fab fab-right-bottom">
         <a href="/agregarMateria/">
-          <i class="icon f7-icons if-not-md">plus</i>
-          <i class="icon material-icons md-only">add</i>
+            <i class="icon f7-icons if-not-md">plus</i>
+            <i class="icon material-icons md-only">add</i>
         </a>
-      </div>
+    </div>
     <div class="page-content">
-        <div class="row justify-content-center">
-            <h2 id="bienvenidoHome"></h2>
-            <div class="col-100">
-                <div class="list">
-                    <ul>
-                        <li class="item-content item-input">
-                            <div class="item-inner">
-                                <div class="item-title item-label">Carrera</div>
-                                <div class="item-input-wrap input-dropdown-wrap">
-                                    <select id="selectorCarreraHome">
-                                    </select>
+        <div class="block">
+            <div class="row justify-content-center">
+                <h2 id="bienvenidoHome"></h2>
+                <div class="col-100">
+                    <div class="list">
+                        <ul>
+                            <li class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Carrera</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select id="selectorCarreraHome">
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="list simple-list">
-                    <ul>
-                        <div id="contenedorCorredor" class="row">
-                            <div class="col-100">
-                                <i id="iconoCorredor" class="fas fa-running"></i>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div id="contenedorProgresoCarrera" class="list simple-list">
+                        <div id="preloaderHome" class="row">
+                            <div class="col-100 text-align-center">
+                                <div class="preloader color-green"></div>
                             </div>
                         </div>
-                        <li>
-                            <div class="item-cell width-auto flex-shrink-0">
-                               
-                            </div>
-                            <div class="item-cell flex-shrink-3">
-                                <!-- range slider -->
-                                <div class="range-slider range-slider-init">
-                                    <input type="range" min="0" max="100" step="1" value="0">
+                        <ul class="escondido">
+                            <div id="contenedorCorredor" class="row">
+                                <div class="col-100">
+                                    <i id="iconoCorredor" class="fas fa-running"></i>
                                 </div>
                             </div>
-                            <div class="item-cell width-auto flex-shrink-0">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                        </li>
-                    </ul>
-                    <p class="text-align-center" id="detalleProgreso"></p>
+                            <li>
+                                <div class="item-cell width-auto flex-shrink-0">
+
+                                </div>
+                                <div class="item-cell flex-shrink-3">
+                                    <!-- range slider -->
+                                    <div class="range-slider range-slider-init">
+                                        <input type="range" min="0" max="100" step="1" value="0">
+                                    </div>
+                                </div>
+                                <div class="item-cell width-auto flex-shrink-0">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                            </li>
+                        </ul>
+                        <p class="text-align-center" id="detalleProgreso"></p>
+                    </div>
+
+
                 </div>
-                
+                <button id="botonHomeListadoMaterias" class="button col button-fill">Ver listado de materias</button>
+                <div class="col-100 text-align-center margin-top">
+                    <div class="row justify-content-center">
+                        <div class="col-100">
+                            <h3>Mi promedio</h3>
+                        </div>
+                        <div class="col-50">
+                            <div class="gauge gauge-init my-gauge" data-type="circle" data-value="0" data-value-text="0"
+                        data-value-text-color="#ff9800" data-border-color="#ff9800"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button id="botonHomeListadoMaterias" class="button col button-fill">Ver listado de materias</button>
-             
         </div>
     </div>
 </div>

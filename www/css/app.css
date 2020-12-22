@@ -94,6 +94,10 @@
   display: none;
 }
 
+.escondido{
+  visibility: hidden;
+}
+
 .imagenYTexto{
   align-items: center;
   justify-content: center;
@@ -145,4 +149,16 @@
 
 .headerAnioMateriaPendiente{
   margin-top: 10px !important;
+}
+
+/* DETALLE MATERIA */
+
+.estadoMateriaIcon{
+  font-size: 60px;
+}
+.contenedorEstadoMateria{
+  background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 30px;
 }

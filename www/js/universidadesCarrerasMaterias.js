@@ -5,15 +5,15 @@ Para obtener el temaño de un array
 console.log(console.log(doc.data().medallas.length));*/
 
 //Adicionales
-function compararMateriasPorAnio( mat1, mat2 ) {
-    if ( mat1.anio < mat2.anio ){
-      return -1;
+function compararMateriasPorAnio(mat1, mat2) {
+    if (mat1.anio < mat2.anio) {
+        return -1;
     }
-    if ( mat1.anio > mat2.anio ){
-      return 1;
+    if (mat1.anio > mat2.anio) {
+        return 1;
     }
     return 0;
-  }
+}
 
 
 //Variables globales
@@ -40,12 +40,12 @@ function cargarCarreras() {
 
 }
 
-function cargarCarrerasDelUsuario() {
+async function cargarCarrerasDelUsuario() {
     baseDeDatos = firebase.firestore();
     //console.log("Usuario pasado a BD: "+usuario);
     var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
 
-    refUsuario.get()
+    return refUsuario.get()
         .then(function (doc) {
             $$('#bienvenidoHome').text('¡Bienvenidx, ' + doc.data().nombre + '!');
             nombre = doc.data().nombre;
@@ -53,8 +53,9 @@ function cargarCarrerasDelUsuario() {
                 //console.log(doc.data().carreras[i].nombre);
                 $$('#selectorCarreraHome').append('<option value="' + doc.data().carreras[i].idCarrera + '">' + doc.data().carreras[i].nombre + '</option>');
             }
-            cargarPorcentajeCarrera(doc.data().carreras[0].idCarrera);
-            carreraSeleccionada = doc.data().carreras[0].idCarrera;
+            //carreraSeleccionada = doc.data().carreras[0].idCarrera;
+            return doc.data().carreras[0].idCarrera;
+            //cargarPorcentajeCarrera(doc.data().carreras[0].idCarrera);
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -105,7 +106,7 @@ function guardarCarrera() {
         .then(function (cantidadMaterias) {
             baseDeDatos = firebase.firestore();
             //Obtener materias de la carrera elegida
-            var referenciaMaterias = baseDeDatos.collection('Carreras').doc(idCarreraElegida).collection('materias').orderBy('nombre','asc');
+            var referenciaMaterias = baseDeDatos.collection('Carreras').doc(idCarreraElegida).collection('materias').orderBy('nombre', 'asc');
             //Creo array de materias
             var materiasDeLaCarreraElegida = [];
             referenciaMaterias.get()
@@ -130,7 +131,8 @@ function guardarCarrera() {
                                 idCarrera: idCarreraElegida,
                                 cantidadMateriasAprobadas: 0,
                                 cantidadMateriasPendientes: cantidadMaterias,
-                                materiasPendientes: materiasDeLaCarreraElegida
+                                materiasPendientes: materiasDeLaCarreraElegida,
+                                promedio:0
                             }],
                             medallas: []
                         })
@@ -196,8 +198,19 @@ function cargarPorcentajeCarrera(idCarrera) {
                     $$('#iconoCorredor').css('left', offset + 'px');
                     var cantidadAprobadas = doc.data().carreras[i].cantidadMateriasAprobadas;
                     var cantidadPendientes = doc.data().carreras[i].cantidadMateriasPendientes;
-                    var porcentajeProgreso= doc.data().carreras[i].progreso;
+                    var porcentajeProgreso = doc.data().carreras[i].progreso;
                     $$('#detalleProgreso').text('Hiciste ' + cantidadAprobadas + ' de ' + (cantidadPendientes + cantidadAprobadas) + ' materias. (' + porcentajeProgreso + '%)');
+                    $$('#preloaderHome').addClass('oculto');
+                    $$('#contenedorProgresoCarrera ul').removeClass('escondido');
+
+                    //Mostrar promedio
+                    //Accedo al objeto gauge
+                    var gauge = app.gauge.get('.my-gauge');
+                    var promedioEnPorcentaje=(doc.data().carreras[i].promedio)/10;
+                    gauge.update({
+                        value: promedioEnPorcentaje,
+                        valueText:doc.data().carreras[i].promedio
+                    });
                 }
             }
         })
@@ -239,7 +252,7 @@ function agregarMateriaAListaDeAprobadas() {
     var fechaAprobacionTimeStamp = firebase.firestore.Timestamp.fromDate(new Date(fechaAprobacion));
 
     console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota);
-   
+
     baseDeDatos = firebase.firestore();
     var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
     referenciaUsuario.get()
@@ -265,30 +278,30 @@ function agregarMateriaAListaDeAprobadas() {
             carreraAModificar.materiasPendientes.splice(indiceMateria, 1);
 
             //Creo el objeto materiaAprobada
-            var materiaAprobada={
-                idMateria:idMateria,
-                nombreMateria:nombreMateria,
-                fechaAprobacion:fechaAprobacionTimeStamp,
-                nota:nota
+            var materiaAprobada = {
+                idMateria: idMateria,
+                nombreMateria: nombreMateria,
+                fechaAprobacion: fechaAprobacionTimeStamp,
+                nota: nota
             };
 
             //Actualizo el array materiasAprobadas
             carreraAModificar.materiasAprobadas.push(materiaAprobada);
 
             //Obtengo valores para recalcular el promedio
-            var sumatoriaNotasActual=carreraAModificar.promedio*carreraAModificar.cantidadMateriasAprobadas;
-            var sumatoriaNotasNueva=parseFloat(sumatoriaNotasActual)+parseFloat(nota);
-            
+            var sumatoriaNotasActual = carreraAModificar.promedio * carreraAModificar.cantidadMateriasAprobadas;
+            var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) + parseFloat(nota);
+
             //Actualizo información del progreso
             carreraAModificar.cantidadMateriasAprobadas++;
             carreraAModificar.cantidadMateriasPendientes--;
             //Recalculo promedio
-            var nuevoPromedio=(sumatoriaNotasNueva)/(carreraAModificar.cantidadMateriasAprobadas);
-            carreraAModificar.promedio=Math.round(nuevoPromedio * 10) / 10;
+            var nuevoPromedio = (sumatoriaNotasNueva) / (carreraAModificar.cantidadMateriasAprobadas);
+            carreraAModificar.promedio = Math.round(nuevoPromedio * 10) / 10;
             //Recalculo progreso
-            var nuevoPorcentajeProgreso = (carreraAModificar.cantidadMateriasAprobadas / (carreraAModificar.cantidadMateriasAprobadas+carreraAModificar.cantidadMateriasPendientes)) * 100;
+            var nuevoPorcentajeProgreso = (carreraAModificar.cantidadMateriasAprobadas / (carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes)) * 100;
             nuevoPorcentajeProgreso = Math.round(nuevoPorcentajeProgreso * 10) / 10;
-            carreraAModificar.progreso=nuevoPorcentajeProgreso;
+            carreraAModificar.progreso = nuevoPorcentajeProgreso;
 
             //Borro la materia del array
             referenciaUsuario.update({
@@ -311,10 +324,10 @@ function agregarMateriaAListaDeAprobadas() {
             referenciaUsuario.update({
                 "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
             })
-    
-    
+
+
                 .then(function () {
-    
+
                     console.log("Carrera agregada correctamente.");
                     var toastConfirmacionMateriaAgregada = app.toast.create({
                         icon: '<i class="f7-icons">checkmark_alt</i>',
@@ -324,12 +337,12 @@ function agregarMateriaAListaDeAprobadas() {
                     });
                     toastConfirmacionMateriaAgregada.open();
                     mainView.router.navigate('/home/');
-    
+
                 })
                 .catch(function (error) {
-    
+
                     console.log("Error: " + error);
-    
+
                 });
 
 
@@ -344,7 +357,7 @@ function agregarMateriaAListaDeAprobadas() {
 
 }
 
-function listarMaterias(){
+function listarMaterias() {
     console.log("Carrera seleccionada: " + carreraSeleccionada);
     $$('#listaMateriasAprobadas').empty();
     baseDeDatos = firebase.firestore();
@@ -360,90 +373,127 @@ function listarMaterias(){
             }
             //Listo las materias aprobadas
             for (var j = 0; j < doc.data().carreras[indice].materiasAprobadas.length; j++) {
-                $$('#listaMateriasAprobadas').append('<li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">'+doc.data().carreras[indice].materiasAprobadas[j].nombreMateria+'<div class="item-footer">Nota: '+doc.data().carreras[indice].materiasAprobadas[j].nota+'</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
+                $$('#listaMateriasAprobadas').append('<li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasAprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
             }
-            var idMateriasPendientes=[];
+            var idMateriasPendientes = [];
             for (var k = 0; k < doc.data().carreras[indice].materiasPendientes.length; k++) {
                 /*$$('#listaMateriasAprobadas').append('<li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">'+doc.data().carreras[indice].materiasAprobadas[j].nombreMateria+'<div class="item-footer">Nota: '+doc.data().carreras[indice].materiasAprobadas[j].nota+'</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');*/
                 idMateriasPendientes.push(doc.data().carreras[indice].materiasPendientes[k].idMateria);
             }
             //Voy a buscar a Materias la información restante
             var refMateria;
-            var materias=[];
-            var promesas=[];
+            var materias = [];
+            var promesas = [];
             //Por cada get() se genera una promesa. Las guardo en un array para luego esperar a que todas se resuelvan.
-           for (i = 0; i < idMateriasPendientes.length; i++) {
+            for (i = 0; i < idMateriasPendientes.length; i++) {
                 refMateria = baseDeDatos.collection("Materias").doc(idMateriasPendientes[i]);
-                promesas[i]=refMateria.get()
-                .then(function (doc2){
-                    //Agrego la materia a mi array de materias
-                    materias.push(doc2.data());
-                })
-                .catch(function (error) {
-                    console.log("Error getting documents: ", error);
-                });
+                promesas[i] = refMateria.get()
+                    .then(function (doc2) {
+                        //Agrego la materia a mi array de materias
+                        materias.push(doc2.data());
+                    })
+                    .catch(function (error) {
+                        console.log("Error getting documents: ", error);
+                    });
             }
             //Espero a que todas las promesas se resuelvan ordeno el array de materias
-            var anioActual=-1;
-            var codigoHTMLLista="";
-            
+            var anioActual = -1;
+            var codigoHTMLLista = "";
+
             Promise.all(promesas)
-            .then(values => {
-                materias.sort(compararMateriasPorAnio);
-                for(i=0;i<materias.length;i++){
-                    if(materias[i].anio!=anioActual && materias[i].anio==0){
-                        codigoHTMLLista+='</ul><div class="block-header headerAnioMateriaPendiente">Materias transversales</div><ul>';
-                        anioActual=materias[i].anio;
-                    }
-                    if(materias[i].anio!=anioActual){
-                       
-                        codigoHTMLLista+='</ul><div class="block-header headerAnioMateriaPendiente">Año '+materias[i].anio+'</div><ul>';
-                        anioActual=materias[i].anio;
-                    }
-                    if(materias[i].requiereCorrelativas==true){
-                        var todasAprobadas=true;
-                        var materiaEncontrada;
-                        var listaCorrelativas="";
-                        
-                        for(j=0;j<materias[i].esCorrelativaDe.length;j++){
-                            
-                            materiaEncontrada=false;
-                            for(var k=0;k<doc.data().carreras[indice].materiasAprobadas.length;k++){
-                                if(materias[i].esCorrelativaDe[j]==doc.data().carreras[indice].materiasAprobadas[k].nombreMateria){
-                                    materiaEncontrada=true;
-                                    break;  
+                .then(values => {
+                    materias.sort(compararMateriasPorAnio);
+                    for (i = 0; i < materias.length; i++) {
+                        if (materias[i].anio != anioActual && materias[i].anio == 0) {
+                            codigoHTMLLista += '</ul><div class="block-header headerAnioMateriaPendiente">Materias transversales</div><ul>';
+                            anioActual = materias[i].anio;
+                        }
+                        if (materias[i].anio != anioActual) {
+
+                            codigoHTMLLista += '</ul><div class="block-header headerAnioMateriaPendiente">Año ' + materias[i].anio + '</div><ul>';
+                            anioActual = materias[i].anio;
+                        }
+                        if (materias[i].requiereCorrelativas == true) {
+                            var todasAprobadas = true;
+                            var materiaEncontrada;
+                            var listaCorrelativas = "";
+
+                            for (j = 0; j < materias[i].esCorrelativaDe.length; j++) {
+
+                                materiaEncontrada = false;
+                                for (var k = 0; k < doc.data().carreras[indice].materiasAprobadas.length; k++) {
+                                    if (materias[i].esCorrelativaDe[j] == doc.data().carreras[indice].materiasAprobadas[k].nombreMateria) {
+                                        materiaEncontrada = true;
+                                        break;
+                                    }
+                                }
+                                if (materiaEncontrada == false) {
+                                    //Si la correlativa no fue encontrada en la lista de materias aprobadas, se lista
+                                    todasAprobadas = false;
+                                    listaCorrelativas += materias[i].esCorrelativaDe[j] + '|';
                                 }
                             }
-                            if(materiaEncontrada==false){
-                                //Si la correlativa no fue encontrada en la lista de materias aprobadas, se lista
-                                todasAprobadas=false;
-                                listaCorrelativas+=materias[i].esCorrelativaDe[j]+'|';
+                            if (todasAprobadas == true) {
+                                //Si todas las correlativas fueron encontradas, se muestra Todas aprobadas.
+                                codigoHTMLLista += '<li><a href="/materiaPendiente/'+materias[i].nombre+'/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
+                            } else {
+                                //var correlativasURL = listaCorrelativas.replace(' ', "_");
+                                codigoHTMLLista += '<li class="disabled" style="pointer-events:all !important;"><a href="/materiaPendiente/'+materias[i].nombre+'/' + listaCorrelativas + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas restantes: ' + listaCorrelativas + '</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
                             }
-                        }
-                        if(todasAprobadas==true){
-                            //Si todas las correlativas fueron encontradas, se muestra Todas aprobadas.
-                            codigoHTMLLista+='<li><a href="/materiaPendiente/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
-                        }else{
 
-                            codigoHTMLLista+='<li class="disabled"><a href="/materiaPendiente/'+listaCorrelativas+'/" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">Correlativas restantes: '+listaCorrelativas+'</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
+
+
+                        } else {
+                            codigoHTMLLista += '<li><a href="/materiaPendiente/'+materias[i].nombre+'/no/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: No tiene</div></div></div></a></li>';
                         }
 
-                        
 
-                    }else{
-                        codigoHTMLLista+='<li><a href="/materiaPendiente/no/" class="item-link item-content"><div class="item-inner"><div class="item-title">'+materias[i].nombre+'<div class="item-footer">Correlativas: No tiene</div></div></div></a></li>';
                     }
-                   
-                   
-                }
-                //Remuevo el </ul> del principio del codigo HTML generado
-                codigoHTMLLista.substring(5);
-                $$('#listaMateriasPendientes').append(codigoHTMLLista);
-              });
-            
-            
+                    //Remuevo el </ul> del principio del codigo HTML generado
+                    codigoHTMLLista.substring(5);
+                    $$('#listaMateriasPendientes').append(codigoHTMLLista);
+                });
+
+
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
         });
 }
+
+function mostrarDatosMateriaPendiente(nombreMateria,materiasCorrelativasRestantes){
+    $$('#nombreMateriaPendiente').text(nombreMateria);
+    if(materiasCorrelativasRestantes=="no"){
+        $$('.contenedorEstadoMateria').empty;
+        $$('.contenedorEstadoMateria').append('<i class="f7-icons estadoMateriaIcon">checkmark_alt_circle</i>');
+        $$('.materiaPendienteEstado').text('Estado: Disponible');
+        $$('#materiaPendienteContenedorCorrelativas').empty();
+        $$('#materiaPendienteContenedorCorrelativas').append('<button id="irAAgregarMateria" class="button button-fill">Ir a Agregar materia</button>');
+
+    }else if(materiasCorrelativasRestantes=="aprobadas"){
+        $$('.contenedorEstadoMateria').empty;
+        $$('.contenedorEstadoMateria').append('<i class="f7-icons estadoMateriaIcon">lock_open</i>');
+        $$('.materiaPendienteEstado').text('Estado: Desbloqueada');
+        $$('#materiaPendienteContenedorCorrelativas').empty();
+        $$('#materiaPendienteContenedorCorrelativas').append('<button id="irAAgregarMateria" class="button button-fill">Ir a Agregar materia</button>');
+
+    }else{
+        var materiasCorrelativas = materiasCorrelativasRestantes.split("|");
+        //Remuevo el ultimo elemento del array, ya que siempre está vacío.
+        $$('.contenedorEstadoMateria').empty;
+        $$('.contenedorEstadoMateria').append('<i class="f7-icons estadoMateriaIcon">lock</i>');
+        $$('.materiaPendienteEstado').text('Estado: bloqueada');
+        $$('#materiaPendienteContenedorCorrelativas').prepend('<p>Para desbloquear esta materia tenés que aprobar:</p>');
+        materiasCorrelativas.pop();
+        //console.log(materiasCorrelativas);
+        $$('.materiaPendienteListaCorrelativas').empty();
+        for(var i=0;i<materiasCorrelativas.length;i++){
+            $$('.materiaPendienteListaCorrelativas').append('<li>'+materiasCorrelativas[i]+'</li>')
+        }
+    }
+    
+}
+
+/*
+
+*/

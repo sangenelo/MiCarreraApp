@@ -38,6 +38,10 @@ var app = new Framework7({
     {
       path: '/agregarMateria/',
       url: 'agregarMateria.html'
+    },
+    {
+      path: '/materiaPendiente/:nombreMateria/:correlativas/',
+      url: 'materiaPendiente.html'
     }
   ]
   // ... other parameters
@@ -68,11 +72,6 @@ $$(document).on('page:init', '.page[data-name="index"]', function (e) {
 
 })
 
-$$(document).on('page:reinit', '.page[data-name="index"]', function (e) {
-  $$('.botonAtras').addClass('oculto');
-  $$('.menuIconContenedor').removeClass('oculto');
-})
-
 
 $$(document).on('page:init', '.page[data-name="registrarse"]', function (e) {
 
@@ -82,6 +81,12 @@ $$(document).on('page:init', '.page[data-name="registrarse"]', function (e) {
   $$('#botonRegistro').on('click', function () {
     validarRegistro();
   })
+})
+
+$$(document).on('page:beforeout', '.page[data-name="registrarse"]', function (e) {
+
+  $$('.botonAtras').addClass('oculto');
+  $$('.menuIconContenedor').removeClass('oculto');
 })
 
 $$(document).on('page:init', '.page[data-name="primerInicio"]', function (e) {
@@ -95,7 +100,19 @@ $$(document).on('page:init', '.page[data-name="primerInicio"]', function (e) {
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
   console.log(usuario);
-  cargarCarrerasDelUsuario();
+  //Como para cargar el id de carrera debo consultar la BD, espero a que la promesa esté resuelta para cargar el procentaje.
+  var resultado = cargarCarrerasDelUsuario()
+        .then(function (carreraObtenida) {
+          console.log(carreraObtenida);
+          cargarPorcentajeCarrera(carreraObtenida);
+          carreraSeleccionada=carreraObtenida;
+        })
+        .catch(function (error) {
+
+          console.log("Error: " + error);
+
+      });
+  
   $$('#botonHomeListadoMaterias').on('click', function () {
     mainView.router.navigate('/listadoMaterias/');
   })
@@ -107,9 +124,7 @@ $$(document).on('page:init', '.page[data-name="cargarMaterias"]', function (e) {
     adminSubirMateria();
   })
   
-  $$('#obtenerCorrelativas').on('click', function () {
-    obtenerCorrelativas();
-  })
+ 
 
 })
 
@@ -140,3 +155,19 @@ $$(document).on('page:beforeout', '.page[data-name="agregarMateria"]', function 
   $$('.botonAtras').addClass('oculto');
   $$('.menuIconContenedor').removeClass('oculto');
 })
+
+$$(document).on('page:beforein', '.page[data-name="materiaPendiente"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+})
+
+$$(document).on('page:init', '.page[data-name="materiaPendiente"]', function (e) {
+  var materiasCorrelativasRestantes = app.view.main.router.currentRoute.params.correlativas;
+  var nombreMateria = app.view.main.router.currentRoute.params.nombreMateria;
+  mostrarDatosMateriaPendiente(nombreMateria,materiasCorrelativasRestantes);
+
+  $$('body').on('click', '#irAAgregarMateria', function () {
+   mainView.router.navigate('/agregarMateria/');
+  });
+})
+
