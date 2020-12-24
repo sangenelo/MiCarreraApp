@@ -15,7 +15,7 @@ function compararMateriasPorAnio(mat1, mat2) {
     return 0;
 }
 
-function compararMateriasPorNombre(mat1,mat2){
+function compararMateriasPorNombre(mat1, mat2) {
     if (mat1.nombreMateria < mat2.nombreMateria) {
         return -1;
     }
@@ -39,9 +39,11 @@ function cargarCarreras() {
 
     refUniversidades.get()
         .then(function (querySnapshot) {
+            
+            $$('#listaUniversidades').append('<option value="noUniversidad">Elegí una universidad</option>');
             querySnapshot.forEach(function (doc) {
                 //console.log(doc.data().nombre);
-                $$('#listaUniversidades').append('<option value="' + doc.id + '">' + doc.data().nombre + '</option>')
+                $$('#listaUniversidades').append('<option value="' + doc.id + '">' + doc.data().nombre + '</option>');
             });
         })
         .catch(function (error) {
@@ -59,6 +61,9 @@ async function cargarCarrerasDelUsuario() {
         .then(function (doc) {
             $$('#bienvenidoHome').text('¡Bienvenidx, ' + doc.data().nombre + '!');
             nombre = doc.data().nombre;
+            fotoPerfil = doc.data().fotoPerfil;
+            apellido = doc.data().apellido;
+            rol = doc.data().rol;
             for (var i = 0; i < doc.data().carreras.length; i++) {
                 //console.log(doc.data().carreras[i].nombre);
                 $$('#selectorCarreraHome').append('<option value="' + doc.data().carreras[i].idCarrera + '">' + doc.data().carreras[i].nombre + '</option>');
@@ -91,6 +96,7 @@ function obtenerCarrerasDeUniversidad(idUniversidad) {
     var refCarreras = baseDeDatos.collection("Universidades").doc(idUniversidad).collection("carreras");
     refCarreras.get()
         .then(function (querySnapshot) {
+            $$('#listaCarreras').append('<option value="noCarrera">Elegí una carrera</option>');
             querySnapshot.forEach(function (doc) {
                 //console.log(doc.data().nombre);
                 $$('#listaCarreras').append('<option value="' + doc.data().idCarrera + '">' + doc.data().nombre + '</option>')
@@ -111,56 +117,109 @@ $$('body').on('change', '#listaCarreras', function () {
 });
 
 function guardarCarrera() {
+    $$('.agregarCarrera').addClass('disabled');
+    $$('.agregarCarrera').text('Agregando carrera');
     //Como el resultado de esta función es una promesa, debo ejecutar el código en then, ya que allí es donde se resuelve la misma.
     var cantidadMateriasPromesa = getCantidadMaterias(idCarreraElegida)
         .then(function (cantidadMaterias) {
-            baseDeDatos = firebase.firestore();
-            //Obtener materias de la carrera elegida
-            var referenciaMaterias = baseDeDatos.collection('Carreras').doc(idCarreraElegida).collection('materias').orderBy('nombre', 'asc');
-            //Creo array de materias
-            var materiasDeLaCarreraElegida = [];
-            referenciaMaterias.get()
-                .then(function (querySnapshot) {
-                    querySnapshot.forEach(function (doc) {
-                        //Por cada materia, la agrego a los arrays
-                        //materiasDeLaCarreraElegida.push(doc.data().idMateria);
-                        materiasDeLaCarreraElegida.push({
-                            idMateria: doc.data().idMateria,
-                            nombreMateria: doc.data().nombre
-                        });
-                    });
-                    console.log(materiasDeLaCarreraElegida);
+
+            var universidadPromesa = getUniversidad(idCarreraElegida)
+                .then(function (universidad) {
+                    baseDeDatos = firebase.firestore();
+
+                    //Validar que la carrera elegida no esté actualmente elegida
                     var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
-                    referenciaUsuario.update
-                        ({
-                            carreras: [{
-                                materiasAprobadas: [],
-                                progreso: 0,
-                                alcanzoTituloIntermedio: false,
-                                nombre: nombreCarreraElegida,
-                                idCarrera: idCarreraElegida,
-                                cantidadMateriasAprobadas: 0,
-                                cantidadMateriasPendientes: cantidadMaterias,
-                                materiasPendientes: materiasDeLaCarreraElegida,
-                                promedio:0
-                            }],
-                            medallas: []
-                        })
-                        .then(function () {
+                    referenciaUsuario.get()
+                        .then(function (doc) {
+                            //Itero entre las carreras hasta encontrar la carreras seleccionada
+                            var yaEstaActiva = false;
+                            for (var i = 0; i < doc.data().carreras.length; i++) {
+                                if (doc.data().carreras[i].idCarrera == idCarreraElegida) {
+                                    yaEstaActiva = true;
+                                    break;
+                                }
+                            }
+                            if (yaEstaActiva == false) {
+                                //Obtener materias de la carrera elegida
+                                var referenciaMaterias = baseDeDatos.collection('Carreras').doc(idCarreraElegida).collection('materias').orderBy('nombre', 'asc');
+                                //Creo array de materias
+                                var materiasDeLaCarreraElegida = [];
+                                referenciaMaterias.get()
+                                    .then(function (querySnapshot) {
+                                        querySnapshot.forEach(function (doc) {
+                                            //Por cada materia, la agrego a los arrays
+                                            //materiasDeLaCarreraElegida.push(doc.data().idMateria);
+                                            materiasDeLaCarreraElegida.push({
+                                                idMateria: doc.data().idMateria,
+                                                nombreMateria: doc.data().nombre
+                                            });
+                                        });
+                                        console.log(materiasDeLaCarreraElegida);
+                                        var carreraNueva = {
+                                            materiasAprobadas: [],
+                                            progreso: 0,
+                                            alcanzoTituloIntermedio: false,
+                                            nombre: nombreCarreraElegida,
+                                            idCarrera: idCarreraElegida,
+                                            cantidadMateriasAprobadas: 0,
+                                            cantidadMateriasPendientes: cantidadMaterias,
+                                            materiasPendientes: materiasDeLaCarreraElegida,
+                                            promedio: 0,
+                                            universidad: universidad
+                                        }
+                                        var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
+                                        referenciaUsuario.update({
+                                            "carreras": firebase.firestore.FieldValue.arrayUnion(carreraNueva)
+                                        })
 
-                            console.log("Carrera agregada al usuario " + usuario + " en la BD.");
-                            mainView.router.navigate('/home/');
+                                            .then(function () {
 
+                                                console.log("Carrera agregada al usuario " + usuario + " en la BD.");
+                                                $$('.agregarCarrera').text('Agregar carrera');
+                                                var toastConfirmacionCarreraAgregada = app.toast.create({
+                                                    icon: '<i class="f7-icons">checkmark_alt</i>',
+                                                    text: 'Carrera agregada correctamente.',
+                                                    position: 'center',
+                                                    closeTimeout: 2000,
+                                                });
+                                                toastConfirmacionCarreraAgregada.open();
+                                                mainView.router.navigate('/home/');
+
+                                            })
+                                            .catch(function (error) {
+
+                                                console.log("Error: " + error);
+
+                                            });
+                                    })
+                                    .catch(function (error) {
+                                        console.log("Error getting documents: ", error);
+                                    });
+                            } else {
+                                console.log("Error, la carrera ya está activa");
+                                $$('.agregarCarrera').text('Agregar carrera');
+                                var toastCarreraYaActiva = app.toast.create({
+                                    icon: '<i class="f7-icons">exclamationmark_triangle</i>',
+                                    text: 'La carrera que seleecionaste ya está activa.',
+                                    position: 'center',
+                                    closeTimeout: 2000,
+                                });
+                                toastCarreraYaActiva.open();
+                            }
                         })
                         .catch(function (error) {
-
-                            console.log("Error: " + error);
-
+                            console.log("Error getting documents: ", error);
                         });
+
+
                 })
                 .catch(function (error) {
-                    console.log("Error getting documents: ", error);
+
+                    console.log("Error: " + error);
+
                 });
+
+
 
 
 
@@ -174,7 +233,6 @@ function guardarCarrera() {
 
 
 async function getCantidadMaterias(idCarrera) {
-    //var cantidadMaterias = 0;
     baseDeDatos = firebase.firestore();
     var refCarreras = baseDeDatos.collection("Carreras").doc(idCarrera);
 
@@ -182,6 +240,22 @@ async function getCantidadMaterias(idCarrera) {
         .then(function (doc) {
             //cantidadMaterias = doc.data().cantidadMaterias;
             return doc.data().cantidadMaterias;
+        })
+        .catch(function (error) {
+
+            console.log("Error: ", error);
+
+        });
+
+}
+
+async function getUniversidad(idCarrera) {
+    baseDeDatos = firebase.firestore();
+    var refCarreras = baseDeDatos.collection("Carreras").doc(idCarrera);
+
+    return refCarreras.get()
+        .then(function (doc) {
+            return doc.data().universidad;
         })
         .catch(function (error) {
 
@@ -216,10 +290,10 @@ function cargarPorcentajeCarrera(idCarrera) {
                     //Mostrar promedio
                     //Accedo al objeto gauge
                     var gauge = app.gauge.get('.my-gauge');
-                    var promedioEnPorcentaje=(doc.data().carreras[i].promedio)/10;
+                    var promedioEnPorcentaje = (doc.data().carreras[i].promedio) / 10;
                     gauge.update({
                         value: promedioEnPorcentaje,
-                        valueText:doc.data().carreras[i].promedio
+                        valueText: doc.data().carreras[i].promedio
                     });
                 }
             }
@@ -247,7 +321,7 @@ function cargarMateriasPendientesEnAgregarMateria(materiaPasadaPorRuta) {
                 //console.log(doc.data().carreras[indice].materiasPendientes[j]);
                 $$('#agregarMateriaListaMaterias').append('<option value="' + doc.data().carreras[indice].materiasPendientes[j].idMateria + '">' + doc.data().carreras[indice].materiasPendientes[j].nombreMateria + '</option>');
             }
-            if(materiaPasadaPorRuta!=''){
+            if (materiaPasadaPorRuta != '') {
                 var smartSelect = app.smartSelect.get('.smart-select');
                 smartSelect.setValue(materiaPasadaPorRuta);
             }
@@ -259,6 +333,8 @@ function cargarMateriasPendientesEnAgregarMateria(materiaPasadaPorRuta) {
 }
 
 function agregarMateriaAListaDeAprobadas() {
+    $$('#agregarMateriaAprobada').addClass('disabled');
+    $$('#agregarMateriaAprobada').text('Agregando materia');
     var idMateria = $$('#agregarMateriaListaMaterias').val();
     var nombreMateria = $$('#contenedorNombreMateria .item-after').text();
     var fechaAprobacion = $$('#demo-calendar-default').val();
@@ -350,6 +426,8 @@ function agregarMateriaAListaDeAprobadas() {
                         closeTimeout: 2000,
                     });
                     toastConfirmacionMateriaAgregada.open();
+                    $$('#agregarMateriaAprobada').removeClass('disabled');
+                    $$('#agregarMateriaAprobada').text('Agregar materia');
                     mainView.router.navigate('/home/');
 
                 })
@@ -387,7 +465,7 @@ function listarMaterias() {
             }
             //Listo las materias aprobadas
             for (var j = 0; j < doc.data().carreras[indice].materiasAprobadas.length; j++) {
-                $$('#listaMateriasAprobadas').append('<li><a href="/materiaAprobada/'+doc.data().carreras[indice].materiasAprobadas[j].idMateria+'/'+doc.data().carreras[indice].materiasAprobadas[j].nombreMateria+'/'+doc.data().carreras[indice].materiasAprobadas[j].nota+'/'+doc.data().carreras[indice].materiasAprobadas[j].fechaAprobacion.toDate()+'/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasAprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
+                $$('#listaMateriasAprobadas').append('<li><a href="/materiaAprobada/' + doc.data().carreras[indice].materiasAprobadas[j].idMateria + '/' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '/' + doc.data().carreras[indice].materiasAprobadas[j].nota + '/' + doc.data().carreras[indice].materiasAprobadas[j].fechaAprobacion.toDate() + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasAprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
             }
             var idMateriasPendientes = [];
             for (var k = 0; k < doc.data().carreras[indice].materiasPendientes.length; k++) {
@@ -405,13 +483,13 @@ function listarMaterias() {
                     .then(function (doc2) {
                         //Agrego la materia a mi array de materias
                         //materias.push(doc2.data());
-                        var objetoMateria={
-                            anio:doc2.data().anio,
-                            disponible:doc2.data().disponible,
-                            esCorrelativaDe:doc2.data().esCorrelativaDe,
-                            nombre:doc2.data().nombre,
-                            requiereCorrelativas:doc2.data().requiereCorrelativas,
-                            idMateria:doc2.id
+                        var objetoMateria = {
+                            anio: doc2.data().anio,
+                            disponible: doc2.data().disponible,
+                            esCorrelativaDe: doc2.data().esCorrelativaDe,
+                            nombre: doc2.data().nombre,
+                            requiereCorrelativas: doc2.data().requiereCorrelativas,
+                            idMateria: doc2.id
                         }
                         materias.push(objetoMateria);
                     })
@@ -458,16 +536,16 @@ function listarMaterias() {
                             }
                             if (todasAprobadas == true) {
                                 //Si todas las correlativas fueron encontradas, se muestra Todas aprobadas.
-                                codigoHTMLLista += '<li><a href="/materiaPendiente/'+materias[i].idMateria+'/'+materias[i].nombre+'/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
+                                codigoHTMLLista += '<li><a href="/materiaPendiente/' + materias[i].idMateria + '/' + materias[i].nombre + '/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
                             } else {
                                 //var correlativasURL = listaCorrelativas.replace(' ', "_");
-                                codigoHTMLLista += '<li class="disabled" style="pointer-events:all !important;"><a href="/materiaPendiente/'+materias[i].idMateria+'/'+materias[i].nombre+'/' + listaCorrelativas + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas restantes: ' + listaCorrelativas + '</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
+                                codigoHTMLLista += '<li class="disabled" style="pointer-events:all !important;"><a href="/materiaPendiente/' + materias[i].idMateria + '/' + materias[i].nombre + '/' + listaCorrelativas + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas restantes: ' + listaCorrelativas + '</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
                             }
 
 
 
                         } else {
-                            codigoHTMLLista += '<li><a href="/materiaPendiente/'+materias[i].idMateria+'/'+materias[i].nombre+'/no/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: No tiene</div></div></div></a></li>';
+                            codigoHTMLLista += '<li><a href="/materiaPendiente/' + materias[i].idMateria + '/' + materias[i].nombre + '/no/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: No tiene</div></div></div></a></li>';
                         }
 
 
@@ -484,23 +562,23 @@ function listarMaterias() {
         });
 }
 
-function mostrarDatosMateriaPendiente(nombreMateria,materiasCorrelativasRestantes){
+function mostrarDatosMateriaPendiente(nombreMateria, materiasCorrelativasRestantes) {
     $$('#nombreMateriaPendiente').text(nombreMateria);
-    if(materiasCorrelativasRestantes=="no"){
+    if (materiasCorrelativasRestantes == "no") {
         $$('.contenedorEstadoMateria').empty;
         $$('.contenedorEstadoMateria').append('<i class="f7-icons estadoMateriaIcon">checkmark_alt_circle</i>');
         $$('.materiaPendienteEstado').text('Estado: Disponible');
         $$('#materiaPendienteContenedorCorrelativas').empty();
         $$('#materiaPendienteContenedorCorrelativas').append('<button id="irAAgregarMateria" class="button button-fill">Ir a Agregar materia</button>');
 
-    }else if(materiasCorrelativasRestantes=="aprobadas"){
+    } else if (materiasCorrelativasRestantes == "aprobadas") {
         $$('.contenedorEstadoMateria').empty;
         $$('.contenedorEstadoMateria').append('<i class="f7-icons estadoMateriaIcon">lock_open</i>');
         $$('.materiaPendienteEstado').text('Estado: Desbloqueada');
         $$('#materiaPendienteContenedorCorrelativas').empty();
         $$('#materiaPendienteContenedorCorrelativas').append('<button id="irAAgregarMateria" class="button button-fill">Ir a Agregar materia</button>');
 
-    }else{
+    } else {
         var materiasCorrelativas = materiasCorrelativasRestantes.split("|");
         //Remuevo el ultimo elemento del array, ya que siempre está vacío.
         $$('.contenedorEstadoMateria').empty;
@@ -510,21 +588,22 @@ function mostrarDatosMateriaPendiente(nombreMateria,materiasCorrelativasRestante
         materiasCorrelativas.pop();
         //console.log(materiasCorrelativas);
         $$('.materiaPendienteListaCorrelativas').empty();
-        for(var i=0;i<materiasCorrelativas.length;i++){
-            $$('.materiaPendienteListaCorrelativas').append('<li>'+materiasCorrelativas[i]+'</li>')
+        for (var i = 0; i < materiasCorrelativas.length; i++) {
+            $$('.materiaPendienteListaCorrelativas').append('<li>' + materiasCorrelativas[i] + '</li>')
         }
     }
-    
+
 }
 
-function actualizarMateriaAprobada(){
-   
+function actualizarMateriaAprobada() {
+    $$('#actualizarMateriaAprobada').addClass('disabled');
+    $$('#actualizarMateriaAprobada').text('Actualizando materia');
     var idMateria = $$('#materiaAprobadaIdMateria').val();
     var fechaAprobacion = $$('#materiaAprobadaFecha').val();
     var nota = $$('#materiaAprobadaNota').val();
     var nombreMateria = $$('#materiaAprobadaNombreMateria').text();
     var fechaAprobacionTimeStamp = firebase.firestore.Timestamp.fromDate(new Date(fechaAprobacion));
-    
+
     console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota);
 
     baseDeDatos = firebase.firestore();
@@ -550,20 +629,20 @@ function actualizarMateriaAprobada(){
             console.log("Indice de materia: " + indiceMateria);
 
             var notaAnterior = carreraAModificar.materiasAprobadas[indiceMateria].nota;
-            console.log("nota anterior: "+notaAnterior);
-           
+            console.log("nota anterior: " + notaAnterior);
+
             //Modifico la materia elegida del array materiasAprobadas
-            carreraAModificar.materiasAprobadas[indiceMateria].fechaAprobacion=fechaAprobacionTimeStamp;
-            carreraAModificar.materiasAprobadas[indiceMateria].nota=nota;
+            carreraAModificar.materiasAprobadas[indiceMateria].fechaAprobacion = fechaAprobacionTimeStamp;
+            carreraAModificar.materiasAprobadas[indiceMateria].nota = nota;
 
             //Obtengo valores para recalcular el promedio
-            var sumatoriaNotasActual = (carreraAModificar.promedio * carreraAModificar.cantidadMateriasAprobadas)-notaAnterior;
+            var sumatoriaNotasActual = (carreraAModificar.promedio * carreraAModificar.cantidadMateriasAprobadas) - notaAnterior;
             var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) + parseFloat(nota);
 
             //Recalculo promedio
             var nuevoPromedio = (sumatoriaNotasNueva) / (carreraAModificar.cantidadMateriasAprobadas);
             carreraAModificar.promedio = Math.round(nuevoPromedio * 10) / 10;
-            
+
 
             //Borro la materia del array
             referenciaUsuario.update({
@@ -574,7 +653,6 @@ function actualizarMateriaAprobada(){
                 .then(function () {
 
                     console.log("Carrera eliminada correctamente.");
-                    //mainView.router.navigate('/home/');
 
                 })
                 .catch(function (error) {
@@ -598,7 +676,9 @@ function actualizarMateriaAprobada(){
                         closeTimeout: 2000,
                     });
                     toastConfirmacionMateriaActualizada.open();
-                    mainView.router.navigate('/listadoMaterias/');
+                    $$('#actualizarMateriaAprobada').removeClass('disabled');
+                    $$('#actualizarMateriaAprobada').text('Actualizar materia');
+                    mainView.router.navigate('/home/');
 
                 })
                 .catch(function (error) {
@@ -616,7 +696,9 @@ function actualizarMateriaAprobada(){
         });
 }
 
-function moverMateriaDeAprobadasAPendientes(){
+function moverMateriaDeAprobadasAPendientes() {
+    $$('#quitarMateriaAprobada').addClass('disabled');
+    $$('#quitarMateriaAprobada').text('Quitando materia');
     var idMateria = $$('#materiaAprobadaIdMateria').val();
     var fechaAprobacion = $$('#materiaAprobadaFecha').val();
     var nota = $$('#materiaAprobadaNota').val();
@@ -648,7 +730,7 @@ function moverMateriaDeAprobadasAPendientes(){
             console.log("Indice de materia: " + indiceMateria);
 
             var notaEliminada = carreraAModificar.materiasAprobadas[indiceMateria].nota;
-            
+
             //Saco la materia elegida del array materiasAprobadas
             carreraAModificar.materiasAprobadas.splice(indiceMateria, 1);
 
@@ -670,14 +752,14 @@ function moverMateriaDeAprobadasAPendientes(){
             carreraAModificar.cantidadMateriasAprobadas--;
             carreraAModificar.cantidadMateriasPendientes++;
             //Recalculo promedio
-            if(carreraAModificar.cantidadMateriasAprobadas==0){
-                carreraAModificar.promedio=0;
+            if (carreraAModificar.cantidadMateriasAprobadas == 0) {
+                carreraAModificar.promedio = 0;
                 console.log("Promedio debe quedar en 0");
-            }else{
+            } else {
                 var nuevoPromedio = (sumatoriaNotasNueva) / (carreraAModificar.cantidadMateriasAprobadas);
                 carreraAModificar.promedio = Math.round(nuevoPromedio * 10) / 10;
             }
-            
+
             //Recalculo progreso
             var nuevoPorcentajeProgreso = (carreraAModificar.cantidadMateriasAprobadas / (carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes)) * 100;
             nuevoPorcentajeProgreso = Math.round(nuevoPorcentajeProgreso * 10) / 10;
@@ -707,7 +789,7 @@ function moverMateriaDeAprobadasAPendientes(){
 
                 .then(function () {
 
-                    console.log("Carrera agregada correctamente.");
+                    console.log("Carrera quitada correctamente.");
                     var toastConfirmacionMateriaRemovida = app.toast.create({
                         icon: '<i class="f7-icons">checkmark_alt</i>',
                         text: 'Materia quitada correctamente.',
@@ -715,7 +797,9 @@ function moverMateriaDeAprobadasAPendientes(){
                         closeTimeout: 2000,
                     });
                     toastConfirmacionMateriaRemovida.open();
-                    mainView.router.navigate('/listadoMaterias/');
+                    $$('#quitarMateriaAprobada').removeClass('disabled');
+                    $$('#quitarMateriaAprobada').text('Quitar materia');
+                    mainView.router.navigate('/home/');
 
                 })
                 .catch(function (error) {
@@ -734,6 +818,88 @@ function moverMateriaDeAprobadasAPendientes(){
 
 
 }
-/*
 
+//Detecto cambio en el <select> de Carreras en la Homepage
+
+$$('body').on('change', '#selectorCarreraHome', function () {
+    carreraSeleccionada = $$('#selectorCarreraHome').val();
+    cargarPorcentajeCarrera(carreraSeleccionada);
+});
+
+
+/*
+function guardarCarrera() {
+    //Como el resultado de esta función es una promesa, debo ejecutar el código en then, ya que allí es donde se resuelve la misma.
+    var cantidadMateriasPromesa = getCantidadMaterias(idCarreraElegida)
+        .then(function (cantidadMaterias) {
+
+            var universidadPromesa = getUniversidad(idCarreraElegida)
+                .then(function (universidad) {
+                    baseDeDatos = firebase.firestore();
+                    //Obtener materias de la carrera elegida
+                    var referenciaMaterias = baseDeDatos.collection('Carreras').doc(idCarreraElegida).collection('materias').orderBy('nombre', 'asc');
+                    //Creo array de materias
+                    var materiasDeLaCarreraElegida = [];
+                    referenciaMaterias.get()
+                        .then(function (querySnapshot) {
+                            querySnapshot.forEach(function (doc) {
+                                //Por cada materia, la agrego a los arrays
+                                //materiasDeLaCarreraElegida.push(doc.data().idMateria);
+                                materiasDeLaCarreraElegida.push({
+                                    idMateria: doc.data().idMateria,
+                                    nombreMateria: doc.data().nombre
+                                });
+                            });
+                            console.log(materiasDeLaCarreraElegida);
+                            var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
+                            referenciaUsuario.update
+                                ({
+                                    carreras: [{
+                                        materiasAprobadas: [],
+                                        progreso: 0,
+                                        alcanzoTituloIntermedio: false,
+                                        nombre: nombreCarreraElegida,
+                                        idCarrera: idCarreraElegida,
+                                        cantidadMateriasAprobadas: 0,
+                                        cantidadMateriasPendientes: cantidadMaterias,
+                                        materiasPendientes: materiasDeLaCarreraElegida,
+                                        promedio: 0,
+                                        universidad:universidad
+                                    }],
+                                    medallas: []
+                                })
+                                .then(function () {
+
+                                    console.log("Carrera agregada al usuario " + usuario + " en la BD.");
+                                    mainView.router.navigate('/home/');
+
+                                })
+                                .catch(function (error) {
+
+                                    console.log("Error: " + error);
+
+                                });
+                        })
+                        .catch(function (error) {
+                            console.log("Error getting documents: ", error);
+                        });
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+
+
+
+
+        })
+        .catch(function (error) {
+
+            console.log("Error: " + error);
+
+        });
+}
 */

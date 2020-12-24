@@ -29,13 +29,14 @@
     <!-- Path to your custom app styles-->
     <link rel="stylesheet" href="css/app.css">
     <!-- Fontawesome icons -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css"
+        integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
 </head>
 
 <body class="color-theme-green">
     <div id="app">
         <!-- Appbar -->
-        <div class="appbar">
+        <div class="appbar theme-dark">
             <div class="appbar-inner">
                 <div class="left">
                     <div class="menuIconContenedor">
@@ -55,13 +56,20 @@
             </div>
         </div>
         <!-- Panel -->
-        <div class="panel panel-left panel-reveal panel-resizable panel-init">
-            <div class="block">
-              <p>Left Panel content here</p>
-              <p><a class="panel-close" href="#">Close me</a></p>
-              <p><a class="panel-open" href="#" data-panel=".panel-right-1">Open Right Panel</a></p>
+        <div class="panel panel-left panel-reveal panel-resizable panel-init theme-dark">
+            <div class="page">
+                <div class="block">
+                    <p><div class="fotoPerfil fotoPerfilPanel"></div></p>
+                    <p><a class="panel-close" href="/home/"><i class="fas fa-home"></i> Home</a></p>
+                    <p><a class="panel-close" href="/miPerfil/"><i class="fas fa-user"></i> Mi perfil</a></p>
+                    <p><a class="panel-close" href="/misCarreras/"><i class="fas fa-graduation-cap"></i> Mis carreras</a></p>
+                    <p><a class="panel-close" href=""><i class="fas fa-chart-line"></i> Estadísticas</a></p>
+                    <p><a class="panel-close" href=""><i class="fas fa-info-circle"></i> Acerca de</a></p>
+                    <p id="adminLinkPanel" class="oculto"><a class="panel-close" href="/cargarMaterias/"><i class="fas fa-tools"></i> Admin</a></p>
+                    <p><a class="panel-close" id="cerrarSesion" href="#"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></p>
+                </div>
             </div>
-          </div>
+        </div>
         <!-- Your main view, should have "view-main" class -->
         <div class="view view-main">
             <!-- Initial Page, "data-name" contains page name -->
@@ -77,7 +85,8 @@
                                         <div class="item-inner">
                                             <div class="item-title item-label">Mail</div>
                                             <div class="item-input-wrap">
-                                                <input id="emailIngresado" type="email" placeholder="midirección@mail.com">
+                                                <input id="emailIngresado" type="email"
+                                                    placeholder="midirección@mail.com">
                                                 <span class="input-clear-button"></span>
                                                 <div class="item-input-error-message">Email inválido</div>
                                             </div>
@@ -87,7 +96,8 @@
                                         <div class="item-inner">
                                             <div class="item-title item-label">Contraseña</div>
                                             <div class="item-input-wrap">
-                                                <input id="passwordIngresado" type="password" placeholder="Ingrese su contraseña">
+                                                <input id="passwordIngresado" type="password"
+                                                    placeholder="Ingrese su contraseña">
                                                 <span class="input-clear-button"></span>
                                             </div>
                                         </div>
@@ -98,8 +108,8 @@
                             <p id="mensajeDeErrorLogin"></p>
                             <button id="botonInicioSesion" class="button button-fill">Iniciar sesión</button>
                             <p class="text-align-center">¿Primera vez?<a href="/registrarse/"> Registrate acá</a></p>
-                            <p class="text-align-center"><a  href="/cargarMaterias/">Olvidé mi contraseña</a></p>
-                            
+                            <p class="text-align-center"><a href="/cargarMaterias/">Olvidé mi contraseña</a></p>
+
                         </div>
                     </div>
                 </div>
@@ -116,6 +126,7 @@
     <script type="text/javascript" src="js/universidadesCarrerasMaterias.js"></script>
     <script type="text/javascript" src="js/admin.js"></script>
     <script type="text/javascript" src="js/validaciones.js"></script>
+    <script type="text/javascript" src="js/usuario.js"></script>
 
     <!-- FIREBASE -->
 
@@ -127,6 +138,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-storage.js"></script>
 
     <script>
         // Your web app's Firebase configuration

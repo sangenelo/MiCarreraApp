@@ -103,6 +103,16 @@
   justify-content: center;
 }
 
+.fotoPerfilPanel {
+  margin: 0 !important;
+  width: 80px !important;
+  height: 80px !important;
+}
+
+.panel a {
+  color: #FFF;
+}
+
 /* Primer inicio */
 .elegirCarreraTitulo {
   margin-top: 30px;
@@ -119,6 +129,7 @@
 #botonPrimerInicio {
   margin-top: 50px;
 }
+
 
 /* HOME */
 
@@ -161,4 +172,32 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 30px;
+}
+
+/* MI PERFIL */
+.fotoPerfil{
+    border-radius: 50%;
+    border: 2px solid #4cd964;
+    width: 150px;
+    background-image: url();
+    height: 150px;
+    margin: 0 auto;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+#miPerfilContenedorFoto {
+  position: relative;
+}
+#botonSubirFotoPerfil {
+  position: absolute;
+  bottom: -15px;
+  left: calc(50% - 15px);
+  background-color: #4cd964;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+}
+#iconoSubirFotoMiPerfil {
+  line-height: 30px;
 }

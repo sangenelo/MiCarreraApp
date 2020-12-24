@@ -37,7 +37,7 @@ function adminSubirMateria() {
     refIdMateria.set(datos)
         .then(function () {
             $$('#adminMensaje').append("Materia cargada correctamente.");
-            referenciaMateriaDeLaCarrera = baseDeDatos.collection('Carreras').doc('UJ8sQSdxEZRGbuCWH1oM').collection('materias');
+            referenciaMateriaDeLaCarrera = baseDeDatos.collection('Carreras').doc('Bc3uQoqMZ3OOMHD3Qu3I').collection('materias');
 
             datosMateriaDeLaCarrera = {
                 idMateria: idMateria,
@@ -46,7 +46,7 @@ function adminSubirMateria() {
             referenciaMateriaDeLaCarrera.doc().set(datosMateriaDeLaCarrera)
                 .then(function () {
                     $$('#adminMensaje').append("Materia cargada a la carrera correctamente. Id Materia: " + idMateria);
-                    cargarListaCorrelatividades("UJ8sQSdxEZRGbuCWH1oM");
+                    cargarListaCorrelatividades("Bc3uQoqMZ3OOMHD3Qu3I");
                 })
 
                 .catch(function (e) {

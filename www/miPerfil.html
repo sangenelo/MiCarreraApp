@@ -1,0 +1,61 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="miPerfil">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h3 class="text-align-center">Mi perfil</h3>
+                <div class="row justify-content-center">
+                    <div class="col-50 text-align-center">
+                        <div id="miPerfilContenedorFoto">
+                            <div class="fotoPerfil">
+                                <div id="botonSubirFotoPerfil">
+                                    <i id="iconoSubirFotoMiPerfil" class="fas fa-camera"></i>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info" id="miPerfilEmail">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Mail</div>
+                                <div class="item-input-wrap">
+                                    <input class="disabled" id="miPerfilEmailInput" type="email"
+                                        placeholder="midirección@mail.com">
+                                    <div class="item-input-error-message">Email inválido</div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="item-content item-input item-input-with-info" id="miPerfilNombre">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nombre</div>
+                                <div class="item-input-wrap">
+                                    <input id="miPerfilNombreInput" type="text" placeholder="Ingresá tu nombre">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">No se admiten caracteres especiales.</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="miPerfilApellido">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Apellido</div>
+                                <div class="item-input-wrap">
+                                    <input id="miPerfilApellidoInput" type="text" placeholder="Ingresá tu apellido">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">No se admiten caracteres especiales.</div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+                <p id="miPerfilMensaje"></p>
+                <button id="miPerfilActualizarDatos" class="button button-fill disabled">Actualizar datos</button>
+                <p id="eliminarUsuario" class="text-align-center"><a class="text-color-red">Eliminar usuario</a></p>
+            </div>
+        </div>
+    </div>
+</div>

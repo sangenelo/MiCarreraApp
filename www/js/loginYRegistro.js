@@ -95,6 +95,8 @@ function iniciarSesion(email,password){
         console.log(errorMessage);
         $$('#mensajeDeErrorLogin').text(errorMessage);
     });
+    
+
 }
 
 function crearUsuarioEnBaseDeDatos(email,nombre,apellido){
@@ -103,6 +105,10 @@ function crearUsuarioEnBaseDeDatos(email,nombre,apellido){
     datos = {
         nombre: nombre,
         apellido: apellido,
+        rol:"alumno",
+        fotoPerfil:"https://firebasestorage.googleapis.com/v0/b/micarrera-4c1fc.appspot.com/o/fotosDePerfil%2FprofileDefault.png?alt=media&token=7f14fa91-0ef7-4bd1-880f-12c4645342fc",
+        medallas:[],
+        carreras:[]
       }
 
     coleccionUsuarios.doc(email).set(datos)
