@@ -28,6 +28,10 @@ var app = new Framework7({
       url: 'primerInicio.html'
     },
     {
+      path: '/recuperarPassword/',
+      url: 'recuperarPassword.html'
+    },
+    {
       path: '/home/',
       url: 'home.html'
     },
@@ -62,7 +66,20 @@ var app = new Framework7({
     {
       path: '/agregarCarrera/',
       url: 'agregarCarrera.html'
+    },
+    {
+      path: '/estadisticas/',
+      url: 'estadisticas.html'
+    },
+    {
+      path: '/acercaDe/',
+      url: 'acercaDe.html'
+    },
+    {
+      path: '/misMedallas/',
+      url: 'misMedallas.html'
     }
+    
 
   ]
   // ... other parameters
@@ -93,16 +110,23 @@ $$(document).on('page:init', '.page[data-name="index"]', function (e) {
   $$('#botonInicioSesion').on('click', function () {
     validarInicioSesion();
   })
-
+  var panel = app.panel.get('.panel-left');
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       console.log("Usuario logueado");
+      $$('.appbar').removeClass('oculto');
       usuario = user.email;
       mainView.router.navigate('/home/');
+      panel.enableSwipe();
       // User is signed in.
     } else {
       // No user is signed in.
       console.log("Usuario NO logueado");
+      $$('.appbar').addClass('oculto');
+      panel.disableSwipe();
+      $$('#pantallaLogin').removeClass('oculto');
+      $$('#preloaderLogin').addClass('oculto');
+      
     }
   });
 
@@ -119,20 +143,21 @@ $$(document).on('page:init', '.page[data-name="index"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="registrarse"]', function (e) {
-
+/*
   $$('.botonAtras').removeClass('oculto');
   $$('.menuIconContenedor').addClass('oculto');
-
+*/
   $$('#botonRegistro').on('click', function () {
     validarRegistro();
   })
 })
-
+/*
 $$(document).on('page:beforeout', '.page[data-name="registrarse"]', function (e) {
 
   $$('.botonAtras').addClass('oculto');
   $$('.menuIconContenedor').removeClass('oculto');
 })
+*/
 
 $$(document).on('page:init', '.page[data-name="primerInicio"]', function (e) {
   var nombre = app.view.main.router.currentRoute.params.nombre;
@@ -156,8 +181,8 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
+  var cantidadDeClicksEnSombrero=0;
   console.log(usuario);
-  console.log("Pasé por home init")
   //Como para cargar el id de carrera debo consultar la BD, espero a que la promesa esté resuelta para cargar el procentaje.
   var resultado = cargarCarrerasDelUsuario()
     .then(function (carreraObtenida) {
@@ -185,6 +210,23 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
   $$('#botonHomeListadoMaterias').on('click', function () {
     mainView.router.navigate('/listadoMaterias/');
   })
+
+  $$('#iconoGraduado').on('click', function () {
+    setTimeout(function(){ cantidadDeClicksEnSombrero=0 }, 5000);
+    cantidadDeClicksEnSombrero++;
+    if(cantidadDeClicksEnSombrero==5){
+      var toastSorpresa = app.toast.create({
+        icon: '<i style:"font-size:18px;" class="far fa-smile-wink"></i>',
+        text: '¡Paciencia! Seguí estudiando y vas a llegar :)',
+        position: 'center',
+        closeTimeout: 2000,
+    });
+    toastSorpresa.open();
+    
+    }
+  })
+
+
 
 })
 
@@ -338,7 +380,7 @@ $$(document).on('page:beforein', '.page[data-name="misCarreras"]', function (e) 
 
 $$(document).on('page:init', '.page[data-name="misCarreras"]', function (e) {
   listarCarreras();
- 
+
 });
 
 $$(document).on('page:beforein', '.page[data-name="agregarCarrera"]', function (e) {
@@ -352,4 +394,30 @@ $$(document).on('page:init', '.page[data-name="agregarCarrera"]', function (e) {
     guardarCarrera();
   });
 });
+
+$$(document).on('page:init', '.page[data-name="estadisticas"]', function (e) {
+  cargarCarrerasEnEstadisticas();
+  var carreraElegidaEnEstadisticas = carreraSeleccionada;
+  console.log("Carrera elegida en estadisticas: " + carreraElegidaEnEstadisticas);
+  //Detecto cambio en el <select> de Carreras
+  $$('body').on('change', '#selectorCarreraEstadisticas', function () {
+    carreraElegidaEnEstadisticas = $$('#selectorCarreraEstadisticas option:checked').val();
+    mostrarGrafico(carreraElegidaEnEstadisticas);
+  });
+
+  //Charts
+  mostrarGrafico(carreraElegidaEnEstadisticas);
+  
+
+});
+
+$$(document).on('page:init', '.page[data-name="recuperarPassword"]', function (e) {
+  $$('#botonRecuperarEmail').on('click', function () {
+    validarMailRecuperarPassword();
+  })
+});
+
+$$(document).on('page:init', '.page[data-name="misMedallas"]', function (e) {
+  mostrarMedallas();
+})
 

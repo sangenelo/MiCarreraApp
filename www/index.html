@@ -31,12 +31,14 @@
     <!-- Fontawesome icons -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css"
         integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 <body class="color-theme-green">
     <div id="app">
         <!-- Appbar -->
-        <div class="appbar theme-dark">
+        <div class="appbar theme-dark oculto">
             <div class="appbar-inner">
                 <div class="left">
                     <div class="menuIconContenedor">
@@ -62,9 +64,10 @@
                     <p><div class="fotoPerfil fotoPerfilPanel"></div></p>
                     <p><a class="panel-close" href="/home/"><i class="fas fa-home"></i> Home</a></p>
                     <p><a class="panel-close" href="/miPerfil/"><i class="fas fa-user"></i> Mi perfil</a></p>
+                    <p><a class="panel-close" href="/misMedallas/"><i class="fas fa-medal"></i> Mis medallas</a></p>
                     <p><a class="panel-close" href="/misCarreras/"><i class="fas fa-graduation-cap"></i> Mis carreras</a></p>
-                    <p><a class="panel-close" href=""><i class="fas fa-chart-line"></i> Estadísticas</a></p>
-                    <p><a class="panel-close" href=""><i class="fas fa-info-circle"></i> Acerca de</a></p>
+                    <p><a class="panel-close" href="/estadisticas/"><i class="fas fa-chart-line"></i> Estadísticas</a></p>
+                    <p><a class="panel-close" href="/acercaDe/"><i class="fas fa-info-circle"></i> Acerca de</a></p>
                     <p id="adminLinkPanel" class="oculto"><a class="panel-close" href="/cargarMaterias/"><i class="fas fa-tools"></i> Admin</a></p>
                     <p><a class="panel-close" id="cerrarSesion" href="#"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></p>
                 </div>
@@ -76,7 +79,12 @@
             <div data-name="index" class="page">
                 <!-- Scrollable page content -->
                 <div class="page-content login-screen-content">
-                    <div class="row justify-content-center">
+                    <div id="preloaderLogin" class="row">
+                        <div class="col-100 text-align-center">
+                            <div class="preloader color-green"></div>
+                        </div>
+                    </div>
+                    <div id="pantallaLogin" class="row justify-content-center oculto">
                         <div class="col-80">
                             <h1 class="text-align-center">Iniciar Sesión</h1>
                             <div class="list">
@@ -108,7 +116,7 @@
                             <p id="mensajeDeErrorLogin"></p>
                             <button id="botonInicioSesion" class="button button-fill">Iniciar sesión</button>
                             <p class="text-align-center">¿Primera vez?<a href="/registrarse/"> Registrate acá</a></p>
-                            <p class="text-align-center"><a href="/cargarMaterias/">Olvidé mi contraseña</a></p>
+                            <p class="text-align-center"><a href="/recuperarPassword/">Olvidé mi contraseña</a></p>
 
                         </div>
                     </div>
@@ -127,6 +135,8 @@
     <script type="text/javascript" src="js/admin.js"></script>
     <script type="text/javascript" src="js/validaciones.js"></script>
     <script type="text/javascript" src="js/usuario.js"></script>
+    <script type="text/javascript" src="js/medallas.js"></script>
+    <script type="text/javascript" src="js/confetti.js"></script>
 
     <!-- FIREBASE -->
 

@@ -201,3 +201,14 @@
 #iconoSubirFotoMiPerfil {
   line-height: 30px;
 }
+
+/* MIS MEDALLAS */
+
+.medallaContenedor h3{
+  margin:0;
+}
+
+.medallaContenedor img{
+  width: 80%;
+  max-width: 80px;
+}

@@ -123,3 +123,28 @@ function validarCarreraSeleccionada(){
     }
     
 }
+
+function validarMailRecuperarPassword(){
+    var email = $$('#recuperarPasswordEmailInput').val();
+    var email2 = $$('#recuperarPasswordEmailInput2').val();
+    var huboError = false;
+
+    const mailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var testeoMail = mailRegex.test(String(email).toLowerCase());
+
+    if (!testeoMail) {
+        $$('#recuperarPasswordEmailContainer').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#recuperarPasswordEmailContainer').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    if(email != email2){
+        $$('#recuperarPasswordEmailContainer2').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#recuperarPasswordEmailContainer2').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    if(!huboError){
+        recuperarPassword();
+    }
+}

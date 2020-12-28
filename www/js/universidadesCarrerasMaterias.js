@@ -25,6 +25,25 @@ function compararMateriasPorNombre(mat1, mat2) {
     return 0;
 }
 
+function compararMateriasPorFechaAprobacion(mat1, mat2) {
+    if (mat1.fechaAprobacion < mat2.fechaAprobacion) {
+        return -1;
+    }
+    if (mat1.fechaAprobacion > mat2.fechaAprobacion) {
+        return 1;
+    }
+    return 0;
+}
+
+function compararMateriasPorNota(mat1, mat2) {
+    if (parseInt(mat1.nota) > parseInt(mat2.nota)) {
+        return -1;
+    }
+    if (parseInt(mat1.nota) < parseInt(mat2.nota)) {
+        return 1;
+    }
+    return 0;
+}
 
 //Variables globales
 
@@ -355,6 +374,8 @@ function agregarMateriaAListaDeAprobadas() {
             }
             var carreraAModificar = doc.data().carreras[indice];
             var carreraOriginal = doc.data().carreras[indice];
+            
+            
             //Busco la materia seleccionada y guardo el índice
             for (var j = 0; j < doc.data().carreras[indice].materiasPendientes.length; j++) {
                 if (doc.data().carreras[indice].materiasPendientes[j].idMateria == idMateria) {
@@ -428,6 +449,32 @@ function agregarMateriaAListaDeAprobadas() {
                     toastConfirmacionMateriaAgregada.open();
                     $$('#agregarMateriaAprobada').removeClass('disabled');
                     $$('#agregarMateriaAprobada').text('Agregar materia');
+                    
+                    //Medallas
+                    if(nota==10){
+                        verificarMedalla("medallaDiego",0);
+                    }
+                    //Verifico si es la primer materia aprobada (Para asignar medalla)
+                    if(parseInt(carreraOriginal.cantidadMateriasAprobadas)==0){
+                        verificarMedalla("medallaPrimerPaso",1);
+                    }
+
+                    //Verifico el porcentaje
+                    if(carreraAModificar.progreso>=25 && carreraAModificar.progreso<35){
+                        verificarMedalla("medallaPrimerCuarto",2);
+                    }else if(carreraAModificar.progreso>=50 && carreraAModificar.progreso<65){
+                        verificarMedalla("medallaMitad",3);
+                    }else if(carreraAModificar.progreso>=75 && carreraAModificar.progreso<85){
+                        verificarMedalla("medalla75",4);
+                    }
+
+                    //Si se recicibió
+                    if(carreraAModificar.cantidadMateriasPendientes==0){
+                        confetti.start();
+                        setTimeout(function(){ confetti.stop(); }, 10000);
+                        verificarMedalla("medallaGraduado",5);
+                    }
+
                     mainView.router.navigate('/home/');
 
                 })
