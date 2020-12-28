@@ -82,6 +82,18 @@ function verificarMedalla(idMedalla,numeroMedalla) {
                     .then(function () {
 
                         console.log("Medalla agregada correctamente.");
+                        cordova.plugins.notification.local.schedule({
+                            title: '¡Ganaste una medalla!',
+                            text: 'La medalla que ganaste es: "'+medallas[numeroMedalla].nombre+'".',
+                            foreground: true,
+                            vibrate: true,
+                            trigger: { in: 1, unit: 'second' }
+                          });
+                      
+                        
+                        cordova.plugins.notification.local.on('click', function (notification) {
+                          mainView.router.navigate('/misMedallas/');
+                      }, this);
 
                     })
                     .catch(function (error) {

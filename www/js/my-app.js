@@ -79,7 +79,7 @@ var app = new Framework7({
       path: '/misMedallas/',
       url: 'misMedallas.html'
     }
-    
+
 
   ]
   // ... other parameters
@@ -126,7 +126,7 @@ $$(document).on('page:init', '.page[data-name="index"]', function (e) {
       panel.disableSwipe();
       $$('#pantallaLogin').removeClass('oculto');
       $$('#preloaderLogin').addClass('oculto');
-      
+
     }
   });
 
@@ -143,10 +143,10 @@ $$(document).on('page:init', '.page[data-name="index"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="registrarse"]', function (e) {
-/*
-  $$('.botonAtras').removeClass('oculto');
-  $$('.menuIconContenedor').addClass('oculto');
-*/
+  /*
+    $$('.botonAtras').removeClass('oculto');
+    $$('.menuIconContenedor').addClass('oculto');
+  */
   $$('#botonRegistro').on('click', function () {
     validarRegistro();
   })
@@ -181,7 +181,7 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
-  var cantidadDeClicksEnSombrero=0;
+  var cantidadDeClicksEnSombrero = 0;
   console.log(usuario);
   //Como para cargar el id de carrera debo consultar la BD, espero a que la promesa esté resuelta para cargar el procentaje.
   var resultado = cargarCarrerasDelUsuario()
@@ -212,17 +212,17 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
   })
 
   $$('#iconoGraduado').on('click', function () {
-    setTimeout(function(){ cantidadDeClicksEnSombrero=0 }, 5000);
+    setTimeout(function () { cantidadDeClicksEnSombrero = 0 }, 5000);
     cantidadDeClicksEnSombrero++;
-    if(cantidadDeClicksEnSombrero==5){
+    if (cantidadDeClicksEnSombrero == 5) {
       var toastSorpresa = app.toast.create({
         icon: '<i style:"font-size:18px;" class="far fa-smile-wink"></i>',
         text: '¡Paciencia! Seguí estudiando y vas a llegar :)',
         position: 'center',
         closeTimeout: 2000,
-    });
-    toastSorpresa.open();
-    
+      });
+      toastSorpresa.open();
+
     }
   })
 
@@ -371,6 +371,7 @@ $$(document).on('page:init', '.page[data-name="miPerfil"]', function (e) {
   $$('#botonSubirFotoPerfil').on('click', function () {
     actionSheetCamaraMiPerfil.open();
   });
+
 });
 
 $$(document).on('page:beforein', '.page[data-name="misCarreras"]', function (e) {
@@ -407,7 +408,7 @@ $$(document).on('page:init', '.page[data-name="estadisticas"]', function (e) {
 
   //Charts
   mostrarGrafico(carreraElegidaEnEstadisticas);
-  
+
 
 });
 
