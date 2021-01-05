@@ -87,7 +87,9 @@ function verificarMedalla(idMedalla,numeroMedalla) {
                             text: 'La medalla que ganaste es: "'+medallas[numeroMedalla].nombre+'".',
                             foreground: true,
                             vibrate: true,
-                            trigger: { in: 1, unit: 'second' }
+                            smallIcon: "../img/smallIcon.png",
+                            trigger: { in: 1, unit: 'second' },
+                            icon:medallas[numeroMedalla].rutaImagen
                           });
                       
                         
@@ -107,8 +109,7 @@ function verificarMedalla(idMedalla,numeroMedalla) {
         .catch(function (error) {
             console.log("Error getting documents: ", error);
         });
-}
-
+}/*
 function verificarMedallaElDiego() {
     var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
 
@@ -314,3 +315,4 @@ function verificarMedalla75() {
             console.log("Error getting documents: ", error);
         });
 }
+*/

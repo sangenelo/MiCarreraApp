@@ -1,0 +1,42 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="solicitarCarrera">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h2 class="text-align-center">Solicitar Carrera</h2>
+                <p class="text-align-justify text-color-gray" style="font-size: small;">Si no encontraste tu carrera, podés pedirla acá e intentaremos agregarla lo antes posible.</p>
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info"
+                            id="solicitarCarreraUniversidadContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Universidad</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" id="solicitarCarreraUniversidad"
+                                        placeholder="Nombre de la universidad"></textarea>
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">Debes indicar una universidad.</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="solicitarCarreraCarreraContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Carrera</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" id="solicitarCarreraCarrera"
+                                        placeholder="Nombre de la carrera"></textarea>
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">Debes indicar la carrera.</div>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </div>
+                <button id="botonEnviarSolicitudCarrera" class="button button-fill">Enviar</button>
+
+            </div>
+        </div>
+    </div>
+</div>

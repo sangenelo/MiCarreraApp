@@ -1,0 +1,52 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="adminCargarCarrera">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-95">
+                <p class="text-algn-left"><a href="/adminHome/"><i class="icon icon-back"></i></a></p>
+            </div>
+            <div class="col-80">
+                <h1 class="text-align-center">Cargar carrera</h1>
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nombre</div>
+                                <div class="item-input-wrap">
+                                    <input id="adminCargarCarreraNombre" type="text" placeholder="Nombre de la carrera">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Cantidad de materias</div>
+                                <div class="item-input-wrap">
+                                    <input id="adminCargarCarreraCantidadMaterias" type="number" placeholder="Cantidad de materias">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <a class="item-link smart-select smart-select-init" data-open-in="popup"
+                                data-searchbar="true" data-searchbar-placeholder="Buscá tu Universidad" data-page-back-link-text="Confirmar">
+                                <select id="listaUniversidades" name="Universidad" class="adminCargarCarreraUniversidad">
+                                    
+                                </select>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Universidad</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+                <p id="mensajeDeErrorCargarCarrera"></p>
+                <button id="botonCargarCarrera" class="button button-fill">Cargar carrera</button>
+                
+            </div>
+        </div>
+    </div>
+</div>

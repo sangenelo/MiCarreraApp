@@ -97,7 +97,7 @@ function validarNombreYApelldioMiPerfil(){
     }
 }
 
-function validarCarreraSeleccionada(){
+function validarCarreraSeleccionada(modo){
     var carreraElegida = $$('#listaCarreras option:checked').val();
     var idUniversidad = $$('#listaUniversidades option:checked').val();
     if(idUniversidad=="noUniversidad"){
@@ -118,7 +118,13 @@ function validarCarreraSeleccionada(){
             });
             toastCarreraNone.open();
         }else{
-            guardarCarrera();
+            if(modo=='admin'){
+                console.log(carreraElegida);
+                mainView.router.navigate('/cargarMaterias/'+carreraElegida+'/');
+            }else{
+                guardarCarrera();
+            }
+            
         }
     }
     
@@ -146,5 +152,52 @@ function validarMailRecuperarPassword(){
     }
     if(!huboError){
         recuperarPassword();
+    }
+}
+
+function validarError(){
+    var tipoDeError = $$('#errorTipo').val();
+    var masInfo = $$('#errorMasInfo').val();
+    var huboError = false;
+
+    if(tipoDeError=="no"){
+        $$('#errorTipoContainer').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#errorTipoContainer').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    if(masInfo.length<20){
+        $$('#errorMasInfoContainer').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#errorMasInfoContainer').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    var asunto="Error: "+tipoDeError;
+    if(!huboError){
+        enviarMail(asunto,masInfo);
+    }
+}
+
+function validarSolicitudCarrera(){
+    var universidad = $$('#solicitarCarreraUniversidad').val();
+    var carrera = $$('#solicitarCarreraCarrera').val();
+    var huboError = false;
+
+    if(universidad.length==0){
+        $$('#solicitarCarreraUniversidadContainer').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#solicitarCarreraUniversidadContainer').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    if(carrera.length==0){
+        $$('#solicitarCarreraCarreraContainer').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#solicitarCarreraCarreraContainer').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    var asunto="Solicitud de carrera";
+    var mensaje="Por favor agregar la carrera: "+carrera+" de la universidad: "+universidad+". Usuario: "+usuario+".";
+    if(!huboError){
+        enviarMail(asunto,mensaje);
     }
 }

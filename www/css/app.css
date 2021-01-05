@@ -212,3 +212,8 @@
   width: 80%;
   max-width: 80px;
 }
+
+/* ESTADISTICAS */
+.contenedorEstadisticas svg{
+  border-radius: 30px !important;
+}

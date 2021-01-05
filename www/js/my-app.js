@@ -36,7 +36,7 @@ var app = new Framework7({
       url: 'home.html'
     },
     {
-      path: '/cargarMaterias/',
+      path: '/cargarMaterias/:carrera/',
       url: 'cargarMaterias.html'
     },
     {
@@ -78,8 +78,31 @@ var app = new Framework7({
     {
       path: '/misMedallas/',
       url: 'misMedallas.html'
+    },
+    {
+      path: '/adminHome/',
+      url: 'adminHome.html'
+    },
+    {
+      path: '/adminSeleccionarCarrera/',
+      url: 'adminSeleccionarCarrera.html'
+    },
+    {
+      path: '/adminCargarCarrera/',
+      url: 'adminCargarCarrera.html'
+    },
+    {
+      path: '/soporte/',
+      url: 'soporte.html'
+    },
+    {
+      path: '/reportarError/',
+      url: 'reportarError.html'
+    },
+    {
+      path: '/solicitarCarrera/',
+      url: 'solicitarCarrera.html'
     }
-
 
   ]
   // ... other parameters
@@ -236,9 +259,10 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 });
 
 $$(document).on('page:init', '.page[data-name="cargarMaterias"]', function (e) {
-  cargarListaCorrelatividades("UJ8sQSdxEZRGbuCWH1oM");
+  var idCarrera = app.view.main.router.currentRoute.params.carrera;
+  cargarListaCorrelatividades(idCarrera);
   $$('#adminSubirMateria').on('click', function () {
-    adminSubirMateria();
+    adminSubirMateria(idCarrera);
   })
 })
 
@@ -420,5 +444,56 @@ $$(document).on('page:init', '.page[data-name="recuperarPassword"]', function (e
 
 $$(document).on('page:init', '.page[data-name="misMedallas"]', function (e) {
   mostrarMedallas();
-})
+});
+
+$$(document).on('page:beforein', '.page[data-name="soporte"]', function (e) {
+  $$('.botonAtras').addClass('oculto');
+  $$('.menuIconContenedor').removeClass('oculto');
+});
+
+$$(document).on('page:init', '.page[data-name="soporte"]', function (e) {
+
+});
+
+$$(document).on('page:beforein', '.page[data-name="reportarError"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+});
+
+$$(document).on('page:init', '.page[data-name="reportarError"]', function (e) {
+  $$('body').on('change', '#errorTipo', function () {
+    var tipoDeErrorSeleccionado = $$('#errorTipo option:checked').val();
+    mostrarPlaceholderEnReporteDeError(tipoDeErrorSeleccionado);
+  });
+  $$('#botonEnviarReporteError').on('click', function () {
+    validarError();
+  });
+});
+
+$$(document).on('page:beforein', '.page[data-name="solicitarCarrera"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+});
+
+$$(document).on('page:init', '.page[data-name="solicitarCarrera"]', function (e) {
+  $$('#botonEnviarSolicitudCarrera').on('click', function () {
+    validarSolicitudCarrera();
+  });
+});
+
+//ADMIN
+$$(document).on('page:init', '.page[data-name="adminSeleccionarCarrera"]', function (e) {
+  var nombre = app.view.main.router.currentRoute.params.nombre;
+  cargarCarreras();
+  $$('#botonAdminElegirCarrera').on('click', function () {
+    validarCarreraSeleccionada('admin');
+  })
+});
+
+$$(document).on('page:init', '.page[data-name="adminCargarCarrera"]', function (e) {
+  cargarCarreras();
+  $$('#botonCargarCarrera').on('click', function () {
+    cargarCarrera();
+  });
+});
 

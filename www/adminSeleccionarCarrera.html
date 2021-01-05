@@ -1,0 +1,67 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="adminSeleccionarCarrera">
+    <div class="page-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h2 class="text-align-center">Elegí la carrera</h2>
+                <div class="row imagenYTexto elegirCarreraTitulo">
+                    <div class="col-20">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="col-80">
+                        <h3>1 - Elegí una universidad</h3>
+                    </div>
+                </div>
+                <div class="list listaPrimerInicio">
+                    <ul>
+                        <!-- Smart select item -->
+                        <li>
+                            <a class="item-link smart-select smart-select-init" data-open-in="popup"
+                                data-searchbar="true" data-searchbar-placeholder="Buscá tu Universidad" data-page-back-link-text="Confirmar">
+                                <select id="listaUniversidades" name="Universidad">
+                                    
+                                </select>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Universidad</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="primerInicioContenedorCarreras" class="row imagenYTexto elegirCarreraTitulo disabled">
+                    <div class="col-20">
+                        <i class="f7-icons">book</i>
+                    </div>
+                    <div class="col-80">
+                        <h3>2 - Elegí una carrera</h3>
+                    </div>
+                </div>
+                <div class="list listaPrimerInicio">
+                    <ul>
+                        <!-- Smart select item -->
+                        <li>
+                            <a id="primerInicioLinkCarreras" class="item-link smart-select smart-select-init disabled" data-open-in="popup"
+                                data-searchbar="true" data-searchbar-placeholder="Buscá tu carrera" data-page-back-link-text="Confirmar">
+                                <select id="listaCarreras" name="Carrera">
+                                </select>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Carrera</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+
+
+                <button id="botonAdminElegirCarrera" class="button button-fill agregarCarrera">Avanzar</button>
+
+            </div>
+        </div>
+    </div>
+</div>

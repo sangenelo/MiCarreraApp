@@ -1,4 +1,4 @@
-function adminSubirMateria() {
+function adminSubirMateria(idCarreraSeleccionadaEnAdmin) {
     $$('#adminMensaje').empty();
     var nombreMateria = $$('#adminNombreMateria').val();
     var anioMateria = $$('#adminAnio').val();
@@ -37,7 +37,7 @@ function adminSubirMateria() {
     refIdMateria.set(datos)
         .then(function () {
             $$('#adminMensaje').append("Materia cargada correctamente.");
-            referenciaMateriaDeLaCarrera = baseDeDatos.collection('Carreras').doc('Bc3uQoqMZ3OOMHD3Qu3I').collection('materias');
+            referenciaMateriaDeLaCarrera = baseDeDatos.collection('Carreras').doc(idCarreraSeleccionadaEnAdmin).collection('materias');
 
             datosMateriaDeLaCarrera = {
                 idMateria: idMateria,
@@ -46,7 +46,7 @@ function adminSubirMateria() {
             referenciaMateriaDeLaCarrera.doc().set(datosMateriaDeLaCarrera)
                 .then(function () {
                     $$('#adminMensaje').append("Materia cargada a la carrera correctamente. Id Materia: " + idMateria);
-                    cargarListaCorrelatividades("Bc3uQoqMZ3OOMHD3Qu3I");
+                    cargarListaCorrelatividades(idCarreraSeleccionadaEnAdmin);
                 })
 
                 .catch(function (e) {
@@ -74,6 +74,56 @@ function cargarListaCorrelatividades(idCarrera) {
         .catch(function (error) {
             console.log("Error getting documents: ", error);
         });
+}
+
+function cargarCarrera(){
+    var nombreDeLaCarrera=$$('#adminCargarCarreraNombre').val();
+    var cantidadMateriasDeLaCarrera=$$('#adminCargarCarreraCantidadMaterias').val();
+    cantidadMateriasDeLaCarrera = parseInt(cantidadMateriasDeLaCarrera);
+    var universidadDeLaCarrera=$$('.adminCargarCarreraUniversidad option:checked').text();
+    var idUniversidadDeLaCarrera=$$('.adminCargarCarreraUniversidad').val();
+
+    console.log("Nombre: "+nombreDeLaCarrera+" Cantidad: "+cantidadMateriasDeLaCarrera+" Universidad: "+universidadDeLaCarrera+" Id de la universidad: "+idUniversidadDeLaCarrera);
+
+    baseDeDatos = firebase.firestore();
+    refCarreras = baseDeDatos.collection('Carreras');
+    var refCarrerasDoc=refCarreras.doc();
+    var idCarrera=refCarrerasDoc.id;
+    datos = {
+        nombre: nombreDeLaCarrera,
+        universidad: universidadDeLaCarrera,
+        cantidadMaterias:cantidadMateriasDeLaCarrera
+    }
+
+    refCarrerasDoc.set(datos)
+        .then(function () {
+            console.log("Carrera agregada a coleccion Carreras.");
+            $$('#mensajeDeErrorCargarCarrera').empty();
+            $$('#mensajeDeErrorCargarCarrera').append('Carrera agregada a coleccion Carreras.');
+            //Ahora agrego la carrera a la universidad
+            refUniversidad = baseDeDatos.collection('Universidades').doc(idUniversidadDeLaCarrera).collection('carreras');
+            datosCarrera = {
+                idCarrera: idCarrera,
+                nombre: nombreDeLaCarrera
+            }
+        
+            refUniversidad.doc().set(datosCarrera)
+                .then(function () {
+                    console.log("Carrera agregada a coleccion Carreras de la Universidad "+universidadDeLaCarrera);
+                    $$('#mensajeDeErrorCargarCarrera').append("Carrera agregada a coleccion Carreras de la Universidad "+universidadDeLaCarrera+" con el ID: "+idCarrera);
+                    
+                })
+        
+                .catch(function (e) {
+                    console.log('Algo falló');
+                });
+        })
+
+        .catch(function (e) {
+            console.log('Algo falló');
+        });
+
+
 }
 
 

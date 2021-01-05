@@ -1,0 +1,47 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="reportarError">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h2 class="text-align-center">Reportar error</h2>
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info" id="errorTipoContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">¿Que error tuviste?</div>
+                                <div class="item-input-wrap input-dropdown-wrap">
+                                    <select id="errorTipo" placeholder="Tipo de error">
+                                        <option value="no">Seleccione una opción</option>
+                                        <option value="Le faltan materias a mi carrera">Le faltan materias a mi carrera
+                                        </option>
+                                        <option value="Algunas correlatividades están mal en mi carrera">Algunas
+                                            correlatividades están mal en mi carrera</option>
+                                        <option value="Perdí mi progreso">Perdí mi progreso</option>
+                                        <option value="No puedo agregar una materia">No puedo agregar una materia</option>
+                                        <option value="No puedo modificar una materia">No puedo modificar una materia</option>
+                                        <option value="Otro">Otro (Contanos en detalle abajo)</option>
+                                    </select>
+                                    <div class="item-input-error-message">Tenés que elegir un error.</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="errorMasInfoContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Más info</div>
+                                <div class="item-input-wrap">
+                                    <textarea id="errorMasInfo" placeholder="Contanos un poco más."></textarea>
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">Contanos un poco más acerca del error que tuviste.</div>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </div>
+                <button id="botonEnviarReporteError" class="button button-fill">Enviar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
