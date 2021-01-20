@@ -112,7 +112,7 @@ function obtenerCarrerasDeUniversidad(idUniversidad) {
     //Primero vacío el <select> para evitar que se sigan cargando materias cada vez que se cliquea en una universidad en el paso 1.
     $$('#listaCarreras').empty();
     baseDeDatos = firebase.firestore();
-    var refCarreras = baseDeDatos.collection("Universidades").doc(idUniversidad).collection("carreras");
+    var refCarreras = baseDeDatos.collection("Universidades").doc(idUniversidad).collection("carreras").orderBy("nombre", "asc");
     refCarreras.get()
         .then(function (querySnapshot) {
             $$('#listaCarreras').append('<option value="noCarrera">Elegí una carrera</option>');

@@ -31,9 +31,10 @@ function actualizarDatosPerfil(nombre, apellido) {
 function borrarUsuario() {
   baseDeDatos.collection("Usuarios").doc(usuario).delete().then(function () {
     console.log("Usuario eliminado de BD");
-    var user = firebase.auth().currentUser;
+    var usuarioABorrar = firebase.auth().currentUser;
+    console.log("Usuario a borrarse de la autenticacion: "+usuarioABorrar);
 
-    user.delete().then(function () {
+    usuarioABorrar.delete().then(function () {
       console.log("Usuario eliminado de Autenticación");
       var toastConfirmacionUsuarioEliminado = app.toast.create({
         icon: '<i class="f7-icons">checkmark_alt</i>',
@@ -225,6 +226,9 @@ function cargarCarrerasEnEstadisticas() {
 
 function mostrarGrafico(carreraElegidaEnEstadisticas) {
   
+  //Antes que nada, vacio los divs para que no se pisen los graficos
+  $$(".contenedorEstadisticas").empty();
+  
   //Primero debo obtener la carreraSeleccionada
   var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
 
@@ -237,11 +241,13 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
       }
       //Me guardo el array de materias probadas para la carrera elegida
       var materiasAprobadas = doc.data().carreras[indice].materiasAprobadas;
-      //Si no hay materias aprobadas, muestro un mensaje de alerta. Su hay, prosigo
+      //Si no hay materias aprobadas, muestro un mensaje de alerta. Si hay, prosigo
       if (materiasAprobadas.length == 0) {
+        $$(".subtituloEstadisticas").hide();
         $$('#chart_div').append('<div id="chart_div"><div class="row"><div class="col-100"><i style="font-size: 30px;" class="fas fa-exclamation-triangle"></i></div><div class="col-100"><p>Aún no aprobaste ninguna materia.</p></div></div></div>');
       } else {
         $$('#chart_div').empty();
+        $$(".subtituloEstadisticas").show();
         //ordeno por fecha de aprobacion
         materiasAprobadas.sort(compararMateriasPorFechaAprobacion);
         //Creo las variables necesarias
