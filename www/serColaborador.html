@@ -1,0 +1,40 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="serColaborador">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h2 class="text-align-center">Quiero colaborar</h2>
+                <p class="text-align-justify text-color-gray" style="font-size: small;">Si querés convertirte en colaborador/a para cargar nuevas carreras, dejanos tus datos y nos contactaremos con vos :)</p>
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info"
+                            id="colaboradorNombreContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nombre completo</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" id="colaboradorNombre" placeholder="Escribí tu nombre completo"></textarea>
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">Debes indicar tu nombre completo.</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="colaboradorMasInfoContainer">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Mensaje (opcional)</div>
+                                <div class="item-input-wrap">
+                                    <textarea id="colaboradorMasInfo" placeholder="Algo que nos quieras indicar, aclaración, lo que sea."></textarea>
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message"></div>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </div>
+                <button id="botonSerColaborador" class="button button-fill">Enviar</button>
+
+            </div>
+        </div>
+    </div>
+</div>

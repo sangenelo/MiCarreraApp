@@ -201,3 +201,22 @@ function validarSolicitudCarrera(){
         enviarMail(asunto,mensaje);
     }
 }
+
+function validarSolicitudColaborador(){
+    var nombre = $$('#colaboradorNombre').val();
+    var masInfo = $$('#colaboradorMasInfo').val();
+    var huboError = false;
+
+    if(nombre.length==0){
+        $$('#colaboradorNombreContainer').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#colaboradorNombreContainer').removeClass('item-input-with-error-message item-input-invalid');
+    }
+  
+    var asunto="Solicitud para ser colaborador/a";
+    var mensaje="Hola! Me gustaría convertirme en colaborador/a. Mi nombre es "+nombre+". "+masInfo+". Mail: "+usuario;
+    if(!huboError){
+        enviarMail(asunto,mensaje);
+    }
+}

@@ -102,6 +102,10 @@ var app = new Framework7({
     {
       path: '/solicitarCarrera/',
       url: 'solicitarCarrera.html'
+    },
+    {
+      path: '/serColaborador/',
+      url: 'serColaborador.html'
     }
 
   ]
@@ -166,21 +170,12 @@ $$(document).on('page:init', '.page[data-name="index"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="registrarse"]', function (e) {
-  /*
-    $$('.botonAtras').removeClass('oculto');
-    $$('.menuIconContenedor').addClass('oculto');
-  */
+
   $$('#botonRegistro').on('click', function () {
     validarRegistro();
   })
 })
-/*
-$$(document).on('page:beforeout', '.page[data-name="registrarse"]', function (e) {
 
-  $$('.botonAtras').addClass('oculto');
-  $$('.menuIconContenedor').removeClass('oculto');
-})
-*/
 
 $$(document).on('page:init', '.page[data-name="primerInicio"]', function (e) {
   var nombre = app.view.main.router.currentRoute.params.nombre;
@@ -478,6 +473,17 @@ $$(document).on('page:beforein', '.page[data-name="solicitarCarrera"]', function
 $$(document).on('page:init', '.page[data-name="solicitarCarrera"]', function (e) {
   $$('#botonEnviarSolicitudCarrera').on('click', function () {
     validarSolicitudCarrera();
+  });
+});
+
+$$(document).on('page:beforein', '.page[data-name="serColaborador"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+});
+
+$$(document).on('page:init', '.page[data-name="serColaborador"]', function (e) {
+  $$('#botonSerColaborador').on('click', function () {
+    validarSolicitudColaborador();
   });
 });
 
