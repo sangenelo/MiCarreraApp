@@ -193,6 +193,9 @@ $$(document).on('page:beforein', '.page[data-name="home"]', function (e) {
 
 $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
   cargarPorcentajeCarrera(carreraSeleccionada);
+  //En el select seteo la carrera actualmente seleccionada
+  console.log("Se cambia el valor del Select.");
+  $$('#selectorCarreraHome').val(carreraSeleccionada);
 });
 
 
@@ -201,6 +204,8 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
   var cantidadDeClicksEnSombrero = 0;
   console.log(usuario);
+  console.log("La carrera seleccionada actualmente es: " +carreraSeleccionada);
+  
   //Como para cargar el id de carrera debo consultar la BD, espero a que la promesa esté resuelta para cargar el procentaje.
   var resultado = cargarCarrerasDelUsuario()
     .then(function (carreraObtenida) {
@@ -216,6 +221,8 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
         if (rol == 'admin') {
           $$('#adminLinkPanel').removeClass('oculto');
         }
+        //En el select seteo la carrera actualmente seleccionada
+       $$('#selectorCarreraHome').val(carreraSeleccionada);
       }
 
     })

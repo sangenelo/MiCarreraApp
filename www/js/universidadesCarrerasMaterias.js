@@ -88,7 +88,11 @@ async function cargarCarrerasDelUsuario() {
                 $$('#selectorCarreraHome').append('<option value="' + doc.data().carreras[i].idCarrera + '">' + doc.data().carreras[i].nombre + '</option>');
             }
             //carreraSeleccionada = doc.data().carreras[0].idCarrera;
-            return doc.data().carreras[0].idCarrera;
+            if(carreraSeleccionada==null){
+                return doc.data().carreras[0].idCarrera;
+            }else{
+                return carreraSeleccionada;
+            }
             //cargarPorcentajeCarrera(doc.data().carreras[0].idCarrera);
         })
         .catch(function (error) {
@@ -871,6 +875,7 @@ function moverMateriaDeAprobadasAPendientes() {
 $$('body').on('change', '#selectorCarreraHome', function () {
     carreraSeleccionada = $$('#selectorCarreraHome').val();
     cargarPorcentajeCarrera(carreraSeleccionada);
+    //console.log("Seleccionaste la carrera: "+carreraSeleccionada);
 });
 
 

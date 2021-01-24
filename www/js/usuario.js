@@ -244,7 +244,7 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
       //Si no hay materias aprobadas, muestro un mensaje de alerta. Si hay, prosigo
       if (materiasAprobadas.length == 0) {
         $$(".subtituloEstadisticas").hide();
-        $$('#chart_div').append('<div id="chart_div"><div class="row"><div class="col-100"><i style="font-size: 30px;" class="fas fa-exclamation-triangle"></i></div><div class="col-100"><p>Aún no aprobaste ninguna materia.</p></div></div></div>');
+        $$('#chart_div').append('<div class="row"><div class="col-100"><i style="font-size: 30px;" class="fas fa-exclamation-triangle"></i></div><div class="col-100"><p>Aún no aprobaste ninguna materia.</p></div></div>');
       } else {
         $$('#chart_div').empty();
         $$(".subtituloEstadisticas").show();
