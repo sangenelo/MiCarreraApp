@@ -14,7 +14,7 @@ function validarInicioSesion() {
 
 
 function validarRegistro() {
-    var email = $$('#emailIngresadoRegistro').val();
+    var email = $$('#emailIngresadoRegistro').val().toLowerCase();
     var password = $$('#passwordIngresadoRegistro').val();
     var password2 = $$('#passwordIngresadoRegistro2').val();
     var nombre = $$('#nombreIngresadoRegistro').val();

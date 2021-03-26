@@ -32,7 +32,7 @@ function borrarUsuario() {
   baseDeDatos.collection("Usuarios").doc(usuario).delete().then(function () {
     console.log("Usuario eliminado de BD");
     var usuarioABorrar = firebase.auth().currentUser;
-    console.log("Usuario a borrarse de la autenticacion: "+usuarioABorrar);
+    console.log("Usuario a borrarse de la autenticacion: " + usuarioABorrar);
 
     usuarioABorrar.delete().then(function () {
       console.log("Usuario eliminado de Autenticación");
@@ -225,10 +225,10 @@ function cargarCarrerasEnEstadisticas() {
 }
 
 function mostrarGrafico(carreraElegidaEnEstadisticas) {
-  
+
   //Antes que nada, vacio los divs para que no se pisen los graficos
   $$(".contenedorEstadisticas").empty();
-  
+
   //Primero debo obtener la carreraSeleccionada
   var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
 
@@ -304,15 +304,15 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
             },
             chartArea: {
               top: 55,
-              height: '40%' 
-           },
-           colors: ['#4cd964'],
-           height:360,
-           vAxis:{
-             gridlines:{
-               interval:[0,1,2,3,4,6,7,8,9,10]
-             }
-           }
+              height: '40%'
+            },
+            colors: ['#4cd964'],
+            height: 360,
+            vAxis: {
+              gridlines: {
+                interval: [0, 1, 2, 3, 4, 6, 7, 8, 9, 10]
+              }
+            }
           };
 
           // Instantiate and draw our chart, passing in some options.
@@ -340,7 +340,7 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
             cantidadDeNotaActual = 1;
           } else {
             cantidadDeNotaActual++;
-            
+
           }
         }
         //Cuando salgo del for, la ultima nota me va a quedar sin procesar, por eso repito este paso.
@@ -370,9 +370,9 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
 
           // Set chart options
           var options2 = {
-           
-           
-           
+
+
+
           };
 
           // Instantiate and draw our chart, passing in some options.
@@ -389,3 +389,30 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
 
 
 }
+
+//Reparar usuarios con mayusculas en el mail
+function repararUsuariosConMayuscula(usuarioConMayuscula) {
+  console.log("El usuario a reprar es: "+usuarioConMayuscula);
+  var baseDeDatos = firebase.firestore();
+  var refUsuario = baseDeDatos.collection("Usuarios").doc(usuarioConMayuscula);
+  var usuarioEnMinuscula = usuarioConMayuscula.toLowerCase();
+  refUsuario.get()
+    .then(function (doc) {
+      var data = doc.data();
+      baseDeDatos.collection("Usuarios").doc(usuarioEnMinuscula).set(data)
+        .then(function(){
+          console.log("Se creo al usuario: "+usuarioEnMinuscula);
+          baseDeDatos.collection("Usuarios").doc(usuarioConMayuscula).delete().then(() => {
+          console.log("Se borró al usuario: "+usuarioConMayuscula);
+        }).catch((error) => {
+          console.error("Error removing document: ", error);
+        });
+      });
+    })
+    .catch(function (error) {
+      console.log("Error getting documents: ", error);
+    });
+
+}
+
+

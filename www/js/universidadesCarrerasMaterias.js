@@ -514,13 +514,17 @@ function listarMaterias() {
                     var indice = i;
                 }
             }
+            
             //Listo las materias aprobadas
             for (var j = 0; j < doc.data().carreras[indice].materiasAprobadas.length; j++) {
-                $$('#listaMateriasAprobadas').append('<li><a href="/materiaAprobada/' + doc.data().carreras[indice].materiasAprobadas[j].idMateria + '/' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '/' + doc.data().carreras[indice].materiasAprobadas[j].nota + '/' + doc.data().carreras[indice].materiasAprobadas[j].fechaAprobacion.toDate() + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasAprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
+                var nombreMateriaAprobada= doc.data().carreras[indice].materiasAprobadas[j].nombreMateria;
+                if(nombreMateriaAprobada.slice(-1)=="."){
+                    nombreMateriaAprobada=nombreMateriaAprobada.slice(0,-1);
+                }
+                $$('#listaMateriasAprobadas').append('<li><a href="/materiaAprobada/' + doc.data().carreras[indice].materiasAprobadas[j].idMateria + '/' + nombreMateriaAprobada + '/' + doc.data().carreras[indice].materiasAprobadas[j].nota + '/' + doc.data().carreras[indice].materiasAprobadas[j].fechaAprobacion.toDate() + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasAprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
             }
             var idMateriasPendientes = [];
             for (var k = 0; k < doc.data().carreras[indice].materiasPendientes.length; k++) {
-                /*$$('#listaMateriasAprobadas').append('<li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">'+doc.data().carreras[indice].materiasAprobadas[j].nombreMateria+'<div class="item-footer">Nota: '+doc.data().carreras[indice].materiasAprobadas[j].nota+'</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');*/
                 idMateriasPendientes.push(doc.data().carreras[indice].materiasPendientes[k].idMateria);
             }
             //Voy a buscar a Materias la información restante
@@ -533,7 +537,7 @@ function listarMaterias() {
                 promesas[i] = refMateria.get()
                     .then(function (doc2) {
                         //Agrego la materia a mi array de materias
-                        //materias.push(doc2.data());
+                        
                         var objetoMateria = {
                             anio: doc2.data().anio,
                             disponible: doc2.data().disponible,
@@ -565,6 +569,12 @@ function listarMaterias() {
                             codigoHTMLLista += '</ul><div class="block-header headerAnioMateriaPendiente">Año ' + materias[i].anio + '</div><ul>';
                             anioActual = materias[i].anio;
                         }
+
+                        var nombreMateriaPendiente= materias[i].nombre;
+                            if(nombreMateriaPendiente.slice(-1)=="."){
+                                nombreMateriaPendiente=nombreMateriaPendiente.slice(0,-1);
+                            }
+
                         if (materias[i].requiereCorrelativas == true) {
                             var todasAprobadas = true;
                             var materiaEncontrada;
@@ -574,7 +584,7 @@ function listarMaterias() {
 
                                 materiaEncontrada = false;
                                 for (var k = 0; k < doc.data().carreras[indice].materiasAprobadas.length; k++) {
-                                    if (materias[i].esCorrelativaDe[j] == doc.data().carreras[indice].materiasAprobadas[k].nombreMateria) {
+                                    if (materias[i].esCorrelativaDe[j].trim() == doc.data().carreras[indice].materiasAprobadas[k].nombreMateria.trim()) {
                                         materiaEncontrada = true;
                                         break;
                                     }
@@ -585,18 +595,19 @@ function listarMaterias() {
                                     listaCorrelativas += materias[i].esCorrelativaDe[j] + '|';
                                 }
                             }
+                            
                             if (todasAprobadas == true) {
                                 //Si todas las correlativas fueron encontradas, se muestra Todas aprobadas.
-                                codigoHTMLLista += '<li><a href="/materiaPendiente/' + materias[i].idMateria + '/' + materias[i].nombre + '/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
+                                codigoHTMLLista += '<li><a href="/materiaPendiente/' + materias[i].idMateria + '/' + nombreMateriaPendiente + '/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
                             } else {
                                 //var correlativasURL = listaCorrelativas.replace(' ', "_");
-                                codigoHTMLLista += '<li class="disabled" style="pointer-events:all !important;"><a href="/materiaPendiente/' + materias[i].idMateria + '/' + materias[i].nombre + '/' + listaCorrelativas + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas restantes: ' + listaCorrelativas + '</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
+                                codigoHTMLLista += '<li class="disabled" style="pointer-events:all !important;"><a href="/materiaPendiente/' + materias[i].idMateria + '/' + nombreMateriaPendiente + '/' + listaCorrelativas + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas restantes: ' + listaCorrelativas + '</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
                             }
 
 
 
                         } else {
-                            codigoHTMLLista += '<li><a href="/materiaPendiente/' + materias[i].idMateria + '/' + materias[i].nombre + '/no/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: No tiene</div></div></div></a></li>';
+                            codigoHTMLLista += '<li><a href="/materiaPendiente/' + materias[i].idMateria + '/' + nombreMateriaPendiente + '/no/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: No tiene</div></div></div></a></li>';
                         }
 
 
@@ -753,10 +764,9 @@ function moverMateriaDeAprobadasAPendientes() {
     var idMateria = $$('#materiaAprobadaIdMateria').val();
     var fechaAprobacion = $$('#materiaAprobadaFecha').val();
     var nota = $$('#materiaAprobadaNota').val();
-    var nombreMateria = $$('#materiaAprobadaNombreMateria').text();
     var fechaAprobacionTimeStamp = firebase.firestore.Timestamp.fromDate(new Date(fechaAprobacion));
 
-    console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota);
+    //console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota);
 
     baseDeDatos = firebase.firestore();
     var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
@@ -777,6 +787,9 @@ function moverMateriaDeAprobadasAPendientes() {
                 }
             }
 
+            //Obtener Nombre materia desde la base de datos (Porque la que viene como dato puede no tener el punto final)
+            var nombreDeLaMateria=carreraAModificar.materiasAprobadas[indiceMateria].nombreMateria;
+
             //console.log(carreraAModificar);
             console.log("Indice de materia: " + indiceMateria);
 
@@ -788,7 +801,7 @@ function moverMateriaDeAprobadasAPendientes() {
             //Creo el objeto materiaPendiente
             var materiaPendiente = {
                 idMateria: idMateria,
-                nombreMateria: nombreMateria
+                nombreMateria: nombreDeLaMateria
             };
 
             //Actualizo el array materiasPendientes

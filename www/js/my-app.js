@@ -13,6 +13,10 @@ var app = new Framework7({
   panel: {
     swipe: 'left',
   },
+  view: {
+    pushState: true,
+    stackPages: true,
+  },
   // Add default routes
   routes: [
     {
@@ -192,6 +196,7 @@ $$(document).on('page:beforein', '.page[data-name="home"]', function (e) {
 });
 
 $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
+  
   cargarPorcentajeCarrera(carreraSeleccionada);
   //En el select seteo la carrera actualmente seleccionada
   console.log("Se cambia el valor del Select.");
@@ -202,10 +207,17 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
+  
+  document.addEventListener("backbutton", onBackKeyDown, false);
+
+  function onBackKeyDown() {
+          alert("back button pressed");
+  };
+  
   var cantidadDeClicksEnSombrero = 0;
   console.log(usuario);
-  console.log("La carrera seleccionada actualmente es: " +carreraSeleccionada);
-  
+  console.log("La carrera seleccionada actualmente es: " + carreraSeleccionada);
+
   //Como para cargar el id de carrera debo consultar la BD, espero a que la promesa esté resuelta para cargar el procentaje.
   var resultado = cargarCarrerasDelUsuario()
     .then(function (carreraObtenida) {
@@ -222,7 +234,7 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
           $$('#adminLinkPanel').removeClass('oculto');
         }
         //En el select seteo la carrera actualmente seleccionada
-       $$('#selectorCarreraHome').val(carreraSeleccionada);
+        $$('#selectorCarreraHome').val(carreraSeleccionada);
       }
 
     })
@@ -386,11 +398,11 @@ $$(document).on('page:init', '.page[data-name="miPerfil"]', function (e) {
       {
         text: 'Tomar foto',
         onClick: function () { funcionCamara(); }
-      },
+      }/*,
       {
         text: 'Elegir de la galería',
         onClick: function () { funcionGaleria(); }
-      }
+      }*/
     ]
   })
 
@@ -507,6 +519,19 @@ $$(document).on('page:init', '.page[data-name="adminCargarCarrera"]', function (
   cargarCarreras();
   $$('#botonCargarCarrera').on('click', function () {
     cargarCarrera();
+  });
+});
+
+$$(document).on('page:init', '.page[data-name="adminHome"]', function (e) {
+  $$('#adminCargarMedallaColaborador').on('click', function () {
+    //verificarMedalla("medallaColaborador",6);
+    verificarMedallaUsuario("rjfleita@hotmail.com", "medallaColaborador", 6);
+  });
+
+  $$('#repararUsuario').on('click', function () {
+    //verificarMedalla("medallaColaborador",6);
+    var usuarioAReparar = $$("#usuarioAReparar").val();
+    repararUsuariosConMayuscula(usuarioAReparar);
   });
 });
 

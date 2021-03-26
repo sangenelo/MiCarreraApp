@@ -34,6 +34,12 @@ var medallas = [
         descripcion: "¡Lo lograste! Te graduaste.",
         rutaImagen: "https://firebasestorage.googleapis.com/v0/b/micarrera-4c1fc.appspot.com/o/medallas%2Fgraduado.png?alt=media&token=08860a0e-c739-4b08-aa74-ea9fcf077b15",
         id: "medallaGraduado"
+    },
+    {
+        nombre: "Colaborador/a",
+        descripcion: "¡Gracias por tu ayuda! Tu aporte fue importante para la app :)",
+        rutaImagen: "https://firebasestorage.googleapis.com/v0/b/micarrera-4c1fc.appspot.com/o/medallas%2Fcolaborador.png?alt=media&token=59271b55-187a-4a47-a14b-bb251b10edaa",
+        id: "medallaColaborador"
     }
 
 ];
@@ -109,9 +115,10 @@ function verificarMedalla(idMedalla,numeroMedalla) {
         .catch(function (error) {
             console.log("Error getting documents: ", error);
         });
-}/*
-function verificarMedallaElDiego() {
-    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
+}
+
+function verificarMedallaUsuario(usuarioElegido,idMedalla,numeroMedalla) {
+    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuarioElegido);
 
     refUsuario.get()
         .then(function (doc) {
@@ -119,7 +126,7 @@ function verificarMedallaElDiego() {
             var yaTieneLaMedalla = false;
             if (medallasUsuario.length != 0) {
                 for (var i = 0; i < medallasUsuario.length; i++) {
-                    if (medallasUsuario[i].nombre == "El diego") {
+                    if (medallasUsuario[i].id == idMedalla) {
                         yaTieneLaMedalla = true;
                         break;
                     }
@@ -127,15 +134,29 @@ function verificarMedallaElDiego() {
             }
             if (!yaTieneLaMedalla) {
                 //Ahora actualizo el array de medallas del usuario
-                console.log("Ganaste medalla El diego");
+                console.log("Ganaste medalla "+idMedalla);
                 refUsuario.update({
-                    "medallas": firebase.firestore.FieldValue.arrayUnion(medallas[0])
+                    "medallas": firebase.firestore.FieldValue.arrayUnion(medallas[numeroMedalla])
                 })
 
 
                     .then(function () {
 
                         console.log("Medalla agregada correctamente.");
+                        cordova.plugins.notification.local.schedule({
+                            title: '¡Ganaste una medalla!',
+                            text: 'La medalla que ganaste es: "'+medallas[numeroMedalla].nombre+'".',
+                            foreground: true,
+                            vibrate: true,
+                            smallIcon: "../img/smallIcon.png",
+                            trigger: { in: 1, unit: 'second' },
+                            icon:medallas[numeroMedalla].rutaImagen
+                          });
+                      
+                        
+                        cordova.plugins.notification.local.on('click', function (notification) {
+                          mainView.router.navigate('/misMedallas/');
+                      }, this);
 
                     })
                     .catch(function (error) {
@@ -150,169 +171,3 @@ function verificarMedallaElDiego() {
             console.log("Error getting documents: ", error);
         });
 }
-
-function verificarMedallaPrimerPaso() {
-    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
-
-    refUsuario.get()
-        .then(function (doc) {
-            var medallasUsuario = doc.data().medallas;
-            var yaTieneLaMedalla = false;
-            if (medallasUsuario.length != 0) {
-                for (var i = 0; i < medallasUsuario.length; i++) {
-                    if (medallasUsuario[i].nombre == "El primer paso") {
-                        yaTieneLaMedalla = true;
-                        break;
-                    }
-                }
-            }
-            if (!yaTieneLaMedalla) {
-                //Ahora actualizo el array de medallas del usuario
-                console.log("Ganaste medalla Primer paso");
-                refUsuario.update({
-                    "medallas": firebase.firestore.FieldValue.arrayUnion(medallas[1])
-                })
-
-
-                    .then(function () {
-
-                        console.log("Medalla agregada correctamente.");
-
-                    })
-                    .catch(function (error) {
-
-                        console.log("Error: " + error);
-
-                    });
-            }
-
-        })
-        .catch(function (error) {
-            console.log("Error getting documents: ", error);
-        });
-}
-
-function verificarMedalla25() {
-    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
-
-    refUsuario.get()
-        .then(function (doc) {
-            var medallasUsuario = doc.data().medallas;
-            var yaTieneLaMedalla = false;
-            if (medallasUsuario.length != 0) {
-                for (var i = 0; i < medallasUsuario.length; i++) {
-                    if (medallasUsuario[i].id == "medallaPrimerCuarto") {
-                        yaTieneLaMedalla = true;
-                        break;
-                    }
-                }
-            }
-            if (!yaTieneLaMedalla) {
-                //Ahora actualizo el array de medallas del usuario
-                console.log("Ganaste medalla Primer cuarto");
-                refUsuario.update({
-                    "medallas": firebase.firestore.FieldValue.arrayUnion(medallas[2])
-                })
-
-
-                    .then(function () {
-
-                        console.log("Medalla agregada correctamente.");
-
-                    })
-                    .catch(function (error) {
-
-                        console.log("Error: " + error);
-
-                    });
-            }
-
-        })
-        .catch(function (error) {
-            console.log("Error getting documents: ", error);
-        });
-}
-
-
-function verificarMedalla50() {
-    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
-
-    refUsuario.get()
-        .then(function (doc) {
-            var medallasUsuario = doc.data().medallas;
-            var yaTieneLaMedalla = false;
-            if (medallasUsuario.length != 0) {
-                for (var i = 0; i < medallasUsuario.length; i++) {
-                    if (medallasUsuario[i].id == "medallaMitad") {
-                        yaTieneLaMedalla = true;
-                        break;
-                    }
-                }
-            }
-            if (!yaTieneLaMedalla) {
-                //Ahora actualizo el array de medallas del usuario
-                console.log("Ganaste medalla Vaso medio lleno");
-                refUsuario.update({
-                    "medallas": firebase.firestore.FieldValue.arrayUnion(medallas[3])
-                })
-
-
-                    .then(function () {
-
-                        console.log("Medalla agregada correctamente.");
-
-                    })
-                    .catch(function (error) {
-
-                        console.log("Error: " + error);
-
-                    });
-            }
-
-        })
-        .catch(function (error) {
-            console.log("Error getting documents: ", error);
-        });
-}
-
-function verificarMedalla75() {
-    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
-
-    refUsuario.get()
-        .then(function (doc) {
-            var medallasUsuario = doc.data().medallas;
-            var yaTieneLaMedalla = false;
-            if (medallasUsuario.length != 0) {
-                for (var i = 0; i < medallasUsuario.length; i++) {
-                    if (medallasUsuario[i].id == "medalla75") {
-                        yaTieneLaMedalla = true;
-                        break;
-                    }
-                }
-            }
-            if (!yaTieneLaMedalla) {
-                //Ahora actualizo el array de medallas del usuario
-                console.log("Ganaste medalla 75%");
-                refUsuario.update({
-                    "medallas": firebase.firestore.FieldValue.arrayUnion(medallas[4])
-                })
-
-
-                    .then(function () {
-
-                        console.log("Medalla agregada correctamente.");
-
-                    })
-                    .catch(function (error) {
-
-                        console.log("Error: " + error);
-
-                    });
-            }
-
-        })
-        .catch(function (error) {
-            console.log("Error getting documents: ", error);
-        });
-}
-*/
