@@ -15,7 +15,6 @@ var app = new Framework7({
   },
   view: {
     pushState: true,
-    stackPages: true,
   },
   // Add default routes
   routes: [
@@ -58,6 +57,10 @@ var app = new Framework7({
     {
       path: '/materiaAprobada/:idMateria/:nombreMateria/:nota/:fecha/',
       url: 'materiaAprobada.html'
+    },
+    {
+      path: '/materiaDesaprobada/:idMateria/:nombreMateria/:nota/',
+      url: 'materiaDesaprobada.html'
     },
     {
       path: '/miPerfil/',
@@ -298,13 +301,17 @@ $$(document).on('page:init', '.page[data-name="agregarMateria"]', function (e) {
   $$('.menuIconContenedor').addClass('oculto');
   materiaPasadaPorRuta = app.view.main.router.currentRoute.params.materia;
   cargarMateriasPendientesEnAgregarMateria(materiaPasadaPorRuta);
+  cargarMateriasEnAgregarFinalDesaprobado(materiaPasadaPorRuta);
   var calendarDefault = app.calendar.create({
     inputEl: '#demo-calendar-default',
     dateFormat: 'mm/dd/yyyy'
   });
   $$('#agregarMateriaAprobada').on('click', function () {
     validarMateriaAprobada();
-  })
+  });
+  $$('#agregarFinalDesAprobado').on('click', function () {
+    validarFinalDesAprobado();
+  });
 })
 
 
@@ -364,6 +371,35 @@ $$(document).on('page:init', '.page[data-name="materiaAprobada"]', function (e) 
   $$('#quitarMateriaAprobada').on('click', function () {
     app.dialog.confirm('La materia pasará a Materias Pendientes', '¿Estás segurx?', function () {
       moverMateriaDeAprobadasAPendientes();
+    });
+  });
+});
+
+
+$$(document).on('page:beforein', '.page[data-name="materiaDesaprobada"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+  var idMateriaDesaprobadaRuta = '';
+  var nombreMateriaDesaprobada = '';
+  var notaMateriaDesaprobada = '';
+})
+
+$$(document).on('page:init', '.page[data-name="materiaDesaprobada"]', function (e) {
+  idMateriaDesaprobadaRuta = app.view.main.router.currentRoute.params.idMateria;
+  nombreMateriaDesaprobada = app.view.main.router.currentRoute.params.nombreMateria;
+  notaMateriaDesaprobada = app.view.main.router.currentRoute.params.nota;
+
+  $$('#materiaDesaprobadaNombreMateria').text(nombreMateriaDesaprobada);
+  $$('#materiaDesaprobadaNota').val(notaMateriaDesaprobada);
+  $$('#materiaDesaprobadaIdMateria').val(idMateriaDesaprobadaRuta);
+
+  $$('#actualizarMateriaDesaprobada').on('click', function () {
+    validarActualizacionMateriaDesaprobada();
+  })
+
+  $$('#quitarMateriaDesaprobada').on('click', function () {
+    app.dialog.confirm('Este final será removido', '¿Estás segurx?', function () {
+      quitarMateriaDesaprobada();
     });
   });
 })

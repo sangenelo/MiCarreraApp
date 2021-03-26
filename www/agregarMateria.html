@@ -1,61 +1,133 @@
 <!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
 <div class="page" data-name="agregarMateria">
     <div class="page-content login-screen-content">
-        <div class="row justify-content-center">
-            <div class="col-80">
-                <h1 class="text-align-center">Agregar materia</h1>
-                <div class="list">
-                    <ul>
-                        <li class="item-content item-input item-input-with-info" id="agregarMateriaSeleccionarMateriaContenedor">
-                            <div class="item-inner">
-                                <div class="item-title item-label">Seleccionar materia</div>
-                                <div class="item-input-wrap">
-                                    <a class="item-link smart-select smart-select-init" data-open-in="popup"
-                                data-searchbar="true">
-                                <select id="agregarMateriaListaMaterias">
-                                    <option value="">Elige una materia</option>
-                                </select>
-                                <div id="contenedorNombreMateria" class="item-content">
-                                    <div class="item-inner">
-                                        <div class="item-title"></div>
-                                    </div>
-                                </div>
-                            </a>
-                                <div class="item-input-error-message">Elegí una materia</div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="item-content item-input item-input-with-info"  id="agregarMateriaSeleccionarFechaContenedor">
-                            
-                              <div class="item-inner">
-                                <div class="item-title item-label">Fecha de aprobación</div>
-                                <div class="item-input-wrap">
-                                  <input type="text" placeholder="¿Cuándo aprobaste?" readonly="readonly" id="demo-calendar-default"/>
-                                  <span class="input-clear-button"></span>
-                                <div class="item-input-error-message">Tenés que ingresar una fecha.</div>
-                                </div>
-                              </div>
-                            
-                          </li>
-                        <li class="item-content item-input item-input-with-info" id="agregarMateriaNotaContenedor">
-                            <div class="item-inner">
-                                <div class="item-title item-label">Nota</div>
-                                <div class="item-input-wrap">
-                                    <input id="agregarMateriaNota" min="4" max="10" type="number" placeholder="Ingrese la nota (Entre 4 y 10)">
-                                    <span class="input-clear-button"></span>
-                                    <div class="item-input-error-message">La nota debe estar entre 4 y 10</div>
-                                </div>
-                            </div>
-                        </li>
-                       
-
-
-                    </ul>
-                    <p id="adminMensaje"></p>
-                </div>
-                <button id="agregarMateriaAprobada" class="button button-fill">Agregar materia</button>
-
+        <div class="toolbar tabbar toolbar-bottom">
+            <div class="toolbar-inner">
+                <a href="#tab-1" class="tab-link tab-link-active">Materia aprobada</a>
+                <a href="#tab-2" class="tab-link">Final desaprobado</a>
             </div>
         </div>
+        <div class="tabs-animated-wrap">
+            <div class="tabs">
+                <div id="tab-1" class="page-content tab tab-active">
+                    <div class="block">
+                        <div class="row justify-content-center">
+                            <div class="col-80">
+                                <h1 class="text-align-center">Agregar materia</h1>
+                                <div class="list">
+                                    <ul>
+                                        <li class="item-content item-input item-input-with-info"
+                                            id="agregarMateriaSeleccionarMateriaContenedor">
+                                            <div class="item-inner">
+                                                <div class="item-title item-label">Seleccionar materia</div>
+                                                <div class="item-input-wrap">
+                                                    <a id="smart-select-materia" class="item-link smart-select smart-select-init"
+                                                        data-open-in="popup" data-searchbar="true">
+                                                        <select id="agregarMateriaListaMaterias">
+                                                            <option value="">Elige una materia</option>
+                                                        </select>
+                                                        <div id="contenedorNombreMateria" class="item-content">
+                                                            <div class="item-inner">
+                                                                <div class="item-title"></div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                    <div class="item-input-error-message">Elegí una materia</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content item-input item-input-with-info"
+                                            id="agregarMateriaSeleccionarFechaContenedor">
+
+                                            <div class="item-inner">
+                                                <div class="item-title item-label">Fecha de aprobación</div>
+                                                <div class="item-input-wrap">
+                                                    <input type="text" placeholder="¿Cuándo aprobaste?"
+                                                        readonly="readonly" id="demo-calendar-default" />
+                                                    <span class="input-clear-button"></span>
+                                                    <div class="item-input-error-message">Tenés que ingresar una fecha.
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </li>
+                                        <li class="item-content item-input item-input-with-info"
+                                            id="agregarMateriaNotaContenedor">
+                                            <div class="item-inner">
+                                                <div class="item-title item-label">Nota</div>
+                                                <div class="item-input-wrap">
+                                                    <input id="agregarMateriaNota" min="4" max="10" type="number"
+                                                        placeholder="Ingrese la nota (Entre 4 y 10)">
+                                                    <span class="input-clear-button"></span>
+                                                    <div class="item-input-error-message">La nota debe estar entre 4 y
+                                                        10</div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+
+
+                                    </ul>
+                                    <p id="adminMensaje"></p>
+                                </div>
+                                <button id="agregarMateriaAprobada" class="button button-fill">Agregar materia</button>
+
+                            </div>
+                        </div>
+                        ...
+                    </div>
+                </div>
+                <div id="tab-2" class="page-content tab">
+                    <div class="block">
+                        <div class="row justify-content-center">
+                            <div class="col-80">
+                                <h1 class="text-align-center">Agregar final desaprobado</h1>
+                                <div class="list">
+                                    <ul>
+                                        <li class="item-content item-input item-input-with-info" id="agregarFinalSeleccionarMateriaContenedor">
+                                            <div class="item-inner">
+                                                <div class="item-title item-label">Seleccionar materia</div>
+                                                <div class="item-input-wrap">
+                                                    <a id="smart-select-final" class="item-link smart-select smart-select-init" data-open-in="popup"
+                                                data-searchbar="true">
+                                                <select id="agregarFinalDesaprobadoListaMaterias">
+                                                    <option value="">Elige una materia</option>
+                                                </select>
+                                                <div id="contenedorNombreMateriaFinalDesaprobado" class="item-content">
+                                                    <div class="item-inner">
+                                                        <div class="item-title"></div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                                <div class="item-input-error-message">Elegí una materia</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content item-input item-input-with-info" id="agregarFinalNotaContenedor">
+                                            <div class="item-inner">
+                                                <div class="item-title item-label">Nota</div>
+                                                <div class="item-input-wrap">
+                                                    <input id="agregarFinalNota" min="0" max="3" type="number" placeholder="Ingrese la nota (Entre 0 y 3)">
+                                                    <span class="input-clear-button"></span>
+                                                    <div class="item-input-error-message">La nota debe estar entre 0 y 3</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                       
+                        
+                        
+                                    </ul>
+                                    <p id="adminMensaje"></p>
+                                </div>
+                                <button id="agregarFinalDesAprobado" class="button button-fill">Agregar final</button>
+                        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>

@@ -147,11 +147,11 @@
 
 /* AGREGAR MATERIA */
 
-#contenedorNombreMateria{
+#contenedorNombreMateria,#contenedorNombreMateriaFinalDesaprobado{
   padding: 0;
 }
 
-#contenedorNombreMateria .item-after{
+#contenedorNombreMateria .item-after,#contenedorNombreMateriaFinalDesaprobado .item-after{
   margin:0 !important;
   padding: 0 !important;
 }
@@ -160,6 +160,9 @@
 
 .headerAnioMateriaPendiente{
   margin-top: 10px !important;
+}
+.block-title.title-strong {
+  font-weight: 600;
 }
 
 /* DETALLE MATERIA */

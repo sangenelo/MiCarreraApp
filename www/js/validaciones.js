@@ -34,6 +34,33 @@ function validarMateriaAprobada() {
 
 };
 
+function validarFinalDesAprobado() {
+    var idMateria = $$('#agregarFinalDesaprobadoListaMaterias').val();
+    var nota = $$('#agregarFinalNota').val();
+    var huboError=false;
+
+    if (idMateria.length<1) {
+        $$('#agregarFinalSeleccionarMateriaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#agregarFinalSeleccionarMateriaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    
+    if(nota<0 || nota >3 || nota.length!=1){
+        $$('#agregarFinalNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#agregarFinalNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    
+   
+    if(!huboError){
+        agregarFinalDesaprobado();
+    }
+
+
+};
+
 function validarActualizacionMateriaAprobada(){
     var idMateria = $$('#materiaAprobadaIdMateria').val();
     var fechaAprobacion = $$('#materiaAprobadaFecha').val();
@@ -65,6 +92,25 @@ function validarActualizacionMateriaAprobada(){
     if(!huboError){
         actualizarMateriaAprobada();
         //console.log(idMateria+" "+fechaAprobacion+" "+nota);
+    }
+
+}
+
+function validarActualizacionMateriaDesaprobada(){
+    var idMateria = $$('#materiaDesaprobadaIdMateria').val();
+    var nota = $$('#materiaDesaprobadaNota').val();
+    var huboError=false;
+
+    if(nota<0 || nota >3 || nota.length!=1){
+        $$('#materiaDesaprobadaNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#materiaDesaprobadaNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    
+   
+    if(!huboError){
+        actualizarMateriaDesaprobada();
     }
 
 }

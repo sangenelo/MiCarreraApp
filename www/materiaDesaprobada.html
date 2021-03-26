@@ -1,0 +1,32 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="materiaDesaprobada">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h2 id="materiaDesaprobadaNombreMateria" class="text-align-center"></h2>
+                <div class="list">
+                    <ul>
+                        <input type="hidden" id="materiaDesaprobadaIdMateria" value="">
+                        
+                        <li class="item-content item-input item-input-with-info" id="materiaDesaprobadaNotaContenedor">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nota</div>
+                                <div class="item-input-wrap">
+                                    <input id="materiaDesaprobadaNota" min="0" max="3" type="number" placeholder="Ingrese la nota (Entre 0 y 3)">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">La nota debe estar entre 0 y 3</div>
+                                </div>
+                            </div>
+                        </li>
+                       
+
+
+                    </ul>
+                    <p id="adminMensaje"></p>
+                </div>
+                <button id="actualizarMateriaDesaprobada" class="button button-fill ">Actualizar nota</button>
+                <button id="quitarMateriaDesaprobada" class="button button-fill color-red margin-top">Quitar final desaprobado</button>
+            </div>
+        </div>
+    </div>
+</div>
