@@ -199,7 +199,7 @@ $$(document).on('page:beforein', '.page[data-name="home"]', function (e) {
 });
 
 $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
-  
+
   cargarPorcentajeCarrera(carreraSeleccionada);
   //En el select seteo la carrera actualmente seleccionada
   console.log("Se cambia el valor del Select.");
@@ -210,13 +210,32 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
-  
+
   document.addEventListener("backbutton", onBackKeyDown, false);
 
   function onBackKeyDown() {
-          alert("back button pressed");
+    var currentPage = app.views.main.router.url;
+    console.log("Current page: " + currentPage);
+    if (currentPage == "/home/" || currentPage == "/index/" || app.view.main.history.length == 1) {
+      app.toast.create({
+        text: 'Presione SALIR para cerrar la app.',
+        closeButton: true,
+        closeButtonText: 'Salir',
+        closeButtonColor: 'green',
+        closeTimeout: 2000,
+        on: {
+          closeButtonClick: function () {
+            navigator.app.exitApp();
+            e.preventDefault();
+          },
+        }
+      }).open();
+    } else {
+      mainView.router.back();
+    }
+    return true;
   };
-  
+
   var cantidadDeClicksEnSombrero = 0;
   console.log(usuario);
   console.log("La carrera seleccionada actualmente es: " + carreraSeleccionada);
@@ -434,17 +453,78 @@ $$(document).on('page:init', '.page[data-name="miPerfil"]', function (e) {
       {
         text: 'Tomar foto',
         onClick: function () { funcionCamara(); }
-      }/*,
+      },
       {
         text: 'Elegir de la galería',
-        onClick: function () { funcionGaleria(); }
-      }*/
+        onClick: function () { app.popup.open(".popup-galeria"); }
+      }
     ]
-  })
+  });
+
 
   $$('#botonSubirFotoPerfil').on('click', function () {
     actionSheetCamaraMiPerfil.open();
   });
+
+
+  $$("#subirImagenDeGaleria").on('click', function () {
+    if ($$('#archivo').val().length) {
+      $$("#subirImagenDeGaleria").text("Subiendo imagen");
+      $$("#subirImagenDeGaleria").addClass("disabled");
+      var archivo = document.getElementById("archivo").files[0];
+      var storageRef = firebase.storage().ref();
+      var nombreFoto = "fotoPerfil" + usuario;
+      var uploadTask = storageRef.child('fotosDePerfil/' + nombreFoto + '.jpg').put(archivo);
+      uploadTask.on('state_changed', function (snapshot) {
+        //console.log(snapshot);
+        $$("#imagenProgresoTexto").removeClass("oculto");
+        $$("#imagenProgreso").removeClass("oculto");
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress.toFixed(2) + '% done');
+        $$("#imagenProgresoTexto").text("Cargando imagen: " + progress.toFixed(2) + "%");
+        app.progressbar.set("#imagenProgreso", progress.toFixed(2), 100);
+      }, function (error) {
+        console.log(error);
+        var toastImagenError = app.toast.create({
+          icon: '<i class="f7-icons">xmark_circle</i>',
+          text: 'Hubo un error al subir la imagen.',
+          position: 'center',
+          closeTimeout: 2000,
+        });
+        toastImagenError.open();
+      }, function () {
+        uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+          var toastImagenOK = app.toast.create({
+            icon: '<i class="f7-icons">checkmark_alt</i>',
+            text: 'Imagen subida correctamente.',
+            position: 'center',
+            closeTimeout: 2000,
+          });
+          toastImagenOK.open();
+          $$("#subirImagenDeGaleria").text("Subir imagen");
+          $$("#subirImagenDeGaleria").removeClass("disabled");
+          fotoPerfil = downloadURL;
+          console.log("Foto perfil: " + fotoPerfil);
+          $$(".fotoPerfil").css("background-image", "url(" + fotoPerfil + ")");
+          actualizarFotoPerfil();
+          app.popup.close(".popup-galeria");
+          $$("#imagenProgresoTexto").addClass("oculto");
+          $$("#imagenProgreso").addClass("oculto");
+        });
+      });
+    } else {
+      var toastImagenNoHayImagen = app.toast.create({
+        icon: '<i class="f7-icons">xmark_circle</i>',
+        text: 'No se seleccionó ninguna imagen.',
+        position: 'center',
+        closeTimeout: 2000,
+      });
+      toastImagenNoHayImagen.open();
+    }
+
+
+  });
+
 
 });
 

@@ -12,10 +12,12 @@
                                     <i id="iconoSubirFotoMiPerfil" class="fas fa-camera"></i>
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
+
+
                 <div class="list">
                     <ul>
                         <li class="item-content item-input item-input-with-info" id="miPerfilEmail">
@@ -55,6 +57,23 @@
                 <p id="miPerfilMensaje"></p>
                 <button id="miPerfilActualizarDatos" class="button button-fill disabled">Actualizar datos</button>
                 <p id="eliminarUsuario" class="text-align-center"><a class="text-color-red">Eliminar usuario</a></p>
+            </div>
+        </div>
+        <div class="popup popup-galeria">
+            <div class="block">
+                <!-- Close Popup -->
+                <p><a class="link popup-close" href="#">Cerrar</a></p>
+                <h3 class="text-align-center">Seleccionar imagen</h3>
+                <div class="contenedorInputFile">
+                    <form>
+                        <input id="archivo" type="file" accept="image/*" />
+                    </form>
+                </div>
+                <p id="imagenProgresoTexto" class="oculto"></p>
+                <div id="imagenProgreso" class="progressbar color-green oculto" data-progress="0">
+                    <span></span>
+                </div>
+                <button class="button button-fill margin-top" id="subirImagenDeGaleria">Subir imagen</button>
             </div>
         </div>
     </div>

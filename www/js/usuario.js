@@ -52,15 +52,6 @@ function borrarUsuario() {
   });
 }
 
-function funcionGaleria() {
-  navigator.camera.getPicture(onSuccessCamera, onErrorCamera,
-    {
-      quality: 50,
-      destinationType: Camera.DestinationType.FILE_URI,
-      sourceType: Camera.PictureSourceType.PHOTOLIBRARY
-    });
-}
-
 function funcionCamara() {
   console.log('Soy la camara');
   navigator.camera.getPicture(onSuccessCamera, onErrorCamera,
@@ -392,7 +383,7 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
 
 //Reparar usuarios con mayusculas en el mail
 function repararUsuariosConMayuscula(usuarioConMayuscula) {
-  console.log("El usuario a reprar es: "+usuarioConMayuscula);
+  console.log("El usuario a reprar es: " + usuarioConMayuscula);
   var baseDeDatos = firebase.firestore();
   var refUsuario = baseDeDatos.collection("Usuarios").doc(usuarioConMayuscula);
   var usuarioEnMinuscula = usuarioConMayuscula.toLowerCase();
@@ -400,14 +391,14 @@ function repararUsuariosConMayuscula(usuarioConMayuscula) {
     .then(function (doc) {
       var data = doc.data();
       baseDeDatos.collection("Usuarios").doc(usuarioEnMinuscula).set(data)
-        .then(function(){
-          console.log("Se creo al usuario: "+usuarioEnMinuscula);
+        .then(function () {
+          console.log("Se creo al usuario: " + usuarioEnMinuscula);
           baseDeDatos.collection("Usuarios").doc(usuarioConMayuscula).delete().then(() => {
-          console.log("Se borró al usuario: "+usuarioConMayuscula);
-        }).catch((error) => {
-          console.error("Error removing document: ", error);
+            console.log("Se borró al usuario: " + usuarioConMayuscula);
+          }).catch((error) => {
+            console.error("Error removing document: ", error);
+          });
         });
-      });
     })
     .catch(function (error) {
       console.log("Error getting documents: ", error);

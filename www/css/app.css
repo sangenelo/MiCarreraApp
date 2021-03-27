@@ -205,6 +205,13 @@
   line-height: 30px;
 }
 
+.contenedorInputFile {
+  border: 1px solid #4cd964;
+  border-radius: 3px;
+  padding: 10px;
+  margin: 30px 0;
+}
+
 /* MIS MEDALLAS */
 
 .medallaContenedor h3{
