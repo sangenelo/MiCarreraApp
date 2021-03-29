@@ -113,6 +113,10 @@ var app = new Framework7({
     {
       path: '/serColaborador/',
       url: 'serColaborador.html'
+    },
+    {
+      path: '/tutorial/',
+      url: 'tutorial.html'
     }
 
   ]
@@ -191,7 +195,7 @@ $$(document).on('page:init', '.page[data-name="primerInicio"]', function (e) {
   $$('#botonPrimerInicio').on('click', function () {
     validarCarreraSeleccionada();
   })
-})
+});
 
 $$(document).on('page:beforein', '.page[data-name="home"]', function (e) {
   $$('.botonAtras').addClass('oculto');
@@ -210,6 +214,8 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
+
+  verificarTutorial();
 
   document.addEventListener("backbutton", onBackKeyDown, false);
 
@@ -558,10 +564,13 @@ $$(document).on('page:init', '.page[data-name="estadisticas"]', function (e) {
   $$('body').on('change', '#selectorCarreraEstadisticas', function () {
     carreraElegidaEnEstadisticas = $$('#selectorCarreraEstadisticas option:checked').val();
     mostrarGrafico(carreraElegidaEnEstadisticas);
+    compararProgreso(carreraElegidaEnEstadisticas);
   });
 
   //Charts
   mostrarGrafico(carreraElegidaEnEstadisticas);
+
+  compararProgreso(carreraElegidaEnEstadisticas);
 
 
 });
@@ -650,4 +659,17 @@ $$(document).on('page:init', '.page[data-name="adminHome"]', function (e) {
     repararUsuariosConMayuscula(usuarioAReparar);
   });
 });
+
+/* TUTORIAL */
+
+$$(document).on('page:init', '.page[data-name="tutorial"]', function (e) {
+  tutorialVisto();
+  var panel = app.panel.get('.panel-left');
+  panel.disableSwipe();
+});
+
+$$(document).on('page:beforeout', '.page[data-name="tutorial"]', function (e) {
+  var panel = app.panel.get('.panel-left');
+  panel.enableSwipe();
+})
 

@@ -232,3 +232,30 @@ text {
   fill: #555!important;
 }
 
+.estadisticaIcono {
+  font-size: 2em;
+  color: #d0d0d0;
+}
+
+/* TUTORIAL */
+.swiper-wrapper {
+  height: 100%;
+}
+
+.swiper-container {
+  height: 100%;
+}
+
+.contenedorImagenTutorial img {
+    height: 100%;
+}
+.contenedorImagenTutorial {
+    height: 70%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.swiper-slide p {
+  margin: 10px;
+  text-align: center;
+}
