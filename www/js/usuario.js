@@ -187,6 +187,15 @@ function borrarCarrera(idCarrera) {
           });
           toastConfirmacionCarreraEliminada.open();
           listarCarreras();
+          var resultado = cargarCarrerasDelUsuario()
+            .then(function (carreraObtenida) {
+              carreraSeleccionada = carreraObtenida;
+            })
+            .catch(function (error) {
+
+              console.log("Error: " + error);
+
+            });
         })
         .catch(function (error) {
 
@@ -382,77 +391,77 @@ function mostrarGrafico(carreraElegidaEnEstadisticas) {
 }
 
 //Estadística comparación progreso con otres alumnes
-function compararProgreso(carreraElegidaEnEstadisticas){
+function compararProgreso(carreraElegidaEnEstadisticas) {
 
   baseDeDatos = firebase.firestore();
   var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
-  var cantidadDebajoPromedioUsuario=0;
-  var cantidadUsuariosDeLaMismaCarrera=0;
+  var cantidadDebajoPromedioUsuario = 0;
+  var cantidadUsuariosDeLaMismaCarrera = 0;
   referenciaUsuario.get()
-      .then(function (doc) {
-          //Itero entre las carreras hasta encontrar la carreras seleccionada
-          for (var i = 0; i < doc.data().carreras.length; i++) {
-              if (doc.data().carreras[i].idCarrera == carreraElegidaEnEstadisticas) {
-                  var indice = i;
-              }
-          }
-          var nombreDeLaCarreraDelUsuario = doc.data().carreras[indice].nombre;
-          var progresoDeLaCarreraDelUsuario = doc.data().carreras[indice].progreso;
+    .then(function (doc) {
+      //Itero entre las carreras hasta encontrar la carreras seleccionada
+      for (var i = 0; i < doc.data().carreras.length; i++) {
+        if (doc.data().carreras[i].idCarrera == carreraElegidaEnEstadisticas) {
+          var indice = i;
+        }
+      }
+      var nombreDeLaCarreraDelUsuario = doc.data().carreras[indice].nombre;
+      var progresoDeLaCarreraDelUsuario = doc.data().carreras[indice].progreso;
 
-          console.log("Carrera: "+nombreDeLaCarreraDelUsuario+" Progreso: "+progresoDeLaCarreraDelUsuario);
+      console.log("Carrera: " + nombreDeLaCarreraDelUsuario + " Progreso: " + progresoDeLaCarreraDelUsuario);
 
-          //Una vez obtenido el nombre de la carrera y el progreso, voy a buscar que otros usuarios estudian la misma carrera
-          var referenciaTodosLosUsuarios = baseDeDatos.collection('Usuarios');
-          var promesas=[];
-          
-          promesas[0]=referenciaTodosLosUsuarios.get()
-          .then(function (querySnapshot) {
+      //Una vez obtenido el nombre de la carrera y el progreso, voy a buscar que otros usuarios estudian la misma carrera
+      var referenciaTodosLosUsuarios = baseDeDatos.collection('Usuarios');
+      var promesas = [];
 
-              querySnapshot.forEach(function (doc2) {
-                //Busco entre las carreras de cada usuario, la que coicida con la carrera actual seleccionada.
-                for (var i = 0; i < doc2.data().carreras.length; i++) {
-                  if (doc2.data().carreras[i].nombre == nombreDeLaCarreraDelUsuario) {
-                      //console.log("Alumno: "+doc2.data().nombre+" "+doc2.data().apellido+" Progreso: "+doc2.data().carreras[i].progreso);
-                      cantidadUsuariosDeLaMismaCarrera++;
-                      if(doc2.data().carreras[i].progreso<progresoDeLaCarreraDelUsuario){
-                        cantidadDebajoPromedioUsuario++;
-                      }
-                  }
+      promesas[0] = referenciaTodosLosUsuarios.get()
+        .then(function (querySnapshot) {
+
+          querySnapshot.forEach(function (doc2) {
+            //Busco entre las carreras de cada usuario, la que coicida con la carrera actual seleccionada.
+            for (var i = 0; i < doc2.data().carreras.length; i++) {
+              if (doc2.data().carreras[i].nombre == nombreDeLaCarreraDelUsuario) {
+                //console.log("Alumno: "+doc2.data().nombre+" "+doc2.data().apellido+" Progreso: "+doc2.data().carreras[i].progreso);
+                cantidadUsuariosDeLaMismaCarrera++;
+                if (doc2.data().carreras[i].progreso < progresoDeLaCarreraDelUsuario) {
+                  cantidadDebajoPromedioUsuario++;
                 }
-              });
-          })
-          .catch(function (error) {
-              console.log("Error getting documents: ", error);
+              }
+            }
           });
-
-          Promise.all(promesas)
-                .then(values => {
-                  console.log("Cantidad debajo usuario: "+cantidadDebajoPromedioUsuario);
-                  var porcentajeDebajoUsuario=0;
-                  if(cantidadUsuariosDeLaMismaCarrera!=0){
-                    porcentajeDebajoUsuario=(cantidadDebajoPromedioUsuario*100)/cantidadUsuariosDeLaMismaCarrera;
-                    porcentajeDebajoUsuario=porcentajeDebajoUsuario.toFixed(2);
-                  }
-                  console.log("Cantidad total: "+cantidadUsuariosDeLaMismaCarrera);
-                  $$(".contenedorEstadisticaProgreso").removeClass("oculto");
-                  $$(".contenedorEstadisticaProgreso").empty();
-                  $$(".contenedorEstadisticaProgreso").append("<h3 class='subtituloEstadisticas'>Comparación otrxs usuarixs</h3><i class='fas fa-running estadisticaIcono'></i><p>Avanzaste más que el "+porcentajeDebajoUsuario+"% de lxs usuarixs que estudian esta carrera.</p><i class='fas fa-users estadisticaIcono'></i><p>Otrxs "+(cantidadUsuariosDeLaMismaCarrera-1)+" usuarixs estudian la misma carrera que vos.</p>")
-                });
-
-
-      })
-      .catch(function (error) {
+        })
+        .catch(function (error) {
           console.log("Error getting documents: ", error);
-      });
+        });
+
+      Promise.all(promesas)
+        .then(values => {
+          console.log("Cantidad debajo usuario: " + cantidadDebajoPromedioUsuario);
+          var porcentajeDebajoUsuario = 0;
+          if (cantidadUsuariosDeLaMismaCarrera != 0) {
+            porcentajeDebajoUsuario = (cantidadDebajoPromedioUsuario * 100) / cantidadUsuariosDeLaMismaCarrera;
+            porcentajeDebajoUsuario = porcentajeDebajoUsuario.toFixed(2);
+          }
+          console.log("Cantidad total: " + cantidadUsuariosDeLaMismaCarrera);
+          $$(".contenedorEstadisticaProgreso").removeClass("oculto");
+          $$(".contenedorEstadisticaProgreso").empty();
+          $$(".contenedorEstadisticaProgreso").append("<h3 class='subtituloEstadisticas'>Comparación otrxs usuarixs</h3><i class='fas fa-running estadisticaIcono'></i><p>Avanzaste más que el " + porcentajeDebajoUsuario + "% de lxs usuarixs que estudian esta carrera.</p><i class='fas fa-users estadisticaIcono'></i><p>Otrxs " + (cantidadUsuariosDeLaMismaCarrera - 1) + " usuarixs estudian la misma carrera que vos.</p>")
+        });
+
+
+    })
+    .catch(function (error) {
+      console.log("Error getting documents: ", error);
+    });
 }
 
 //Verificar tutorial
-function verificarTutorial(){
+function verificarTutorial() {
   var baseDeDatos = firebase.firestore();
   var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
   refUsuario.get()
     .then(function (doc) {
-      if (typeof doc.data().tutorialVisto == 'undefined' || doc.data().tutorialVisto == false){
+      if (typeof doc.data().tutorialVisto == 'undefined' || doc.data().tutorialVisto == false) {
         mainView.router.navigate('/tutorial/');
       }
     })
@@ -463,16 +472,16 @@ function verificarTutorial(){
 }
 
 //Marcar tutorial como visto
-function tutorialVisto(){
+function tutorialVisto() {
   var baseDeDatos = firebase.firestore();
   var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
   refUsuario.update({
-    tutorialVisto:true
+    tutorialVisto: true
   })
-    .then(()=> {
-      console.log("Se marcó el tutorial como visto para "+usuario);
+    .then(() => {
+      console.log("Se marcó el tutorial como visto para " + usuario);
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log("Error getting documents: ", error);
     });
 

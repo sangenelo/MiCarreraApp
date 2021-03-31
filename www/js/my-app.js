@@ -215,7 +215,21 @@ $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
 
-  verificarTutorial();
+  document.addEventListener("offline", onOffline, false);
+
+  function onOffline() {
+    var toastSinConexion = app.toast.create({
+      icon: '<i style:"font-size:18px;" class="exclamationmark_triangle_fill"></i>',
+      text: 'No tenés conexión a internet :( Para usar la app debés estar conectado.',
+      position: 'center',
+      closeTimeout: 4000,
+    });
+    toastSinConexion.open();
+    setTimeout(function(){ 
+      navigator.app.exitApp();
+     }, 4000);
+    
+  }
 
   document.addEventListener("backbutton", onBackKeyDown, false);
 
@@ -224,7 +238,7 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
     console.log("Current page: " + currentPage);
     if (currentPage == "/home/" || currentPage == "/index/" || app.view.main.history.length == 1) {
       app.toast.create({
-        text: 'Presione SALIR para cerrar la app.',
+        text: 'Presioná SALIR para cerrar la app.',
         closeButton: true,
         closeButtonText: 'Salir',
         closeButtonColor: 'green',
@@ -244,16 +258,17 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
 
   var cantidadDeClicksEnSombrero = 0;
   console.log(usuario);
-  console.log("La carrera seleccionada actualmente es: " + carreraSeleccionada);
+  console.log("(init) La carrera seleccionada actualmente es: " + carreraSeleccionada);
 
   //Como para cargar el id de carrera debo consultar la BD, espero a que la promesa esté resuelta para cargar el procentaje.
   var resultado = cargarCarrerasDelUsuario()
     .then(function (carreraObtenida) {
-      console.log(carreraObtenida);
+      console.log("La carrera obtenida es: "+carreraObtenida);
       if (carreraObtenida == null) {
         console.log("No hay carrera cargada.");
         mainView.router.navigate('/primerInicio/' + nombre + '/');
       } else {
+        verificarTutorial();
         cargarPorcentajeCarrera(carreraObtenida);
         carreraSeleccionada = carreraObtenida;
         $$('.fotoPerfil').css('background-image', 'url("' + fotoPerfil + '")');
