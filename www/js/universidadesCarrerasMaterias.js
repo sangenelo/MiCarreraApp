@@ -305,8 +305,12 @@ function cargarPorcentajeCarrera(idCarrera) {
                     $$('#iconoCorredor').css('left', offset + 'px');
                     var cantidadAprobadas = doc.data().carreras[i].cantidadMateriasAprobadas;
                     var cantidadPendientes = doc.data().carreras[i].cantidadMateriasPendientes;
+                    var cantidadRegulares=0;
+                    if (typeof doc.data().carreras[i].materiasRegulares !== 'undefined'){
+                        cantidadRegulares=doc.data().carreras[i].materiasRegulares.length;
+                    }
                     var porcentajeProgreso = doc.data().carreras[i].progreso;
-                    $$('#detalleProgreso').text('Hiciste ' + cantidadAprobadas + ' de ' + (cantidadPendientes + cantidadAprobadas) + ' materias. (' + porcentajeProgreso + '%)');
+                    $$('#detalleProgreso').text('Hiciste ' + cantidadAprobadas + ' de ' + (cantidadPendientes + cantidadAprobadas+cantidadRegulares) + ' materias. (' + porcentajeProgreso + '%)');
                     $$('#preloaderHome').addClass('oculto');
                     $$('#contenedorProgresoCarrera ul').removeClass('escondido');
 
@@ -340,10 +344,18 @@ function cargarMateriasPendientesEnAgregarMateria(materiaPasadaPorRuta) {
                     var indice = i;
                 }
             }
+            //Listo las materias pendientes
             for (var j = 0; j < doc.data().carreras[indice].materiasPendientes.length; j++) {
                 //console.log(doc.data().carreras[indice].materiasPendientes[j]);
                 $$('#agregarMateriaListaMaterias').append('<option value="' + doc.data().carreras[indice].materiasPendientes[j].idMateria + '">' + doc.data().carreras[indice].materiasPendientes[j].nombreMateria + '</option>');
             }
+            //Listo las materias regulares
+            if (typeof doc.data().carreras[indice].materiasRegulares !== 'undefined') {
+                for (var j = 0; j < doc.data().carreras[indice].materiasRegulares.length; j++) {
+                    $$('#agregarMateriaListaMaterias').append('<option value="' + doc.data().carreras[indice].materiasRegulares[j].idMateria + '">' + doc.data().carreras[indice].materiasRegulares[j].nombreMateria + '</option>');
+                }
+            }
+            
             if (materiaPasadaPorRuta != '') {
                 var smartSelect = app.smartSelect.get('#smart-select-materia');
                 smartSelect.setValue(materiaPasadaPorRuta);
@@ -369,13 +381,21 @@ function cargarMateriasEnAgregarFinalDesaprobado(materiaPasadaPorRuta) {
                     var indice = i;
                 }
             }
+            //Listo las materias aprobadas
             for (var j = 0; j < doc.data().carreras[indice].materiasAprobadas.length; j++) {
-                //console.log(doc.data().carreras[indice].materiasPendientes[j]);
                 $$('#agregarFinalDesaprobadoListaMaterias').append('<option value="' + doc.data().carreras[indice].materiasAprobadas[j].idMateria + '">' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '</option>');
             }
+            //Listo las materias pendientes
             for (var k = 0; k < doc.data().carreras[indice].materiasPendientes.length; k++) {
                 $$('#agregarFinalDesaprobadoListaMaterias').append('<option value="' + doc.data().carreras[indice].materiasPendientes[k].idMateria + '">' + doc.data().carreras[indice].materiasPendientes[k].nombreMateria + '</option>');
             }
+            //Listo las materias regulares
+            if (typeof doc.data().carreras[indice].materiasRegulares !== 'undefined') {
+                for (var j = 0; j < doc.data().carreras[indice].materiasRegulares.length; j++) {
+                    $$('#agregarFinalDesaprobadoListaMaterias').append('<option value="' + doc.data().carreras[indice].materiasRegulares[j].idMateria + '">' + doc.data().carreras[indice].materiasRegulares[j].nombreMateria + '</option>');
+                }
+            }
+
             if (materiaPasadaPorRuta != '') {
                 var smartSelect = app.smartSelect.get('#smart-select-final');
                 smartSelect.setValue(materiaPasadaPorRuta);
@@ -384,6 +404,146 @@ function cargarMateriasEnAgregarFinalDesaprobado(materiaPasadaPorRuta) {
         .catch(function (error) {
             console.log("Error getting documents: ", error);
         });
+
+}
+
+//Cargar materias en "Agregar materia regularizada"
+function cargarMateriasEnAgregarMateriaRegularizada(materiaPasadaPorRuta) {
+    console.log("Carrera seleccionada: " + carreraSeleccionada);
+    baseDeDatos = firebase.firestore();
+    //console.log("Usuario pasado a BD: "+usuario);
+    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
+
+    refUsuario.get()
+        .then(function (doc) {
+            //Itero entre las carreras hasta encontrar la carreras seleccionada
+            for (var i = 0; i < doc.data().carreras.length; i++) {
+                if (doc.data().carreras[i].idCarrera == carreraSeleccionada) {
+                    var indice = i;
+                }
+            }
+            //Listo las materias pendientes
+            for (var k = 0; k < doc.data().carreras[indice].materiasPendientes.length; k++) {
+                $$('#agregarRegularListaMaterias').append('<option value="' + doc.data().carreras[indice].materiasPendientes[k].idMateria + '">' + doc.data().carreras[indice].materiasPendientes[k].nombreMateria + '</option>');
+            }
+            if (materiaPasadaPorRuta != '') {
+                var smartSelect = app.smartSelect.get('#smart-select-regular');
+                smartSelect.setValue(materiaPasadaPorRuta);
+            }
+        })
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
+
+}
+
+function agregarMateriaRegularizada() {
+    $$('#agregarMateriaRegular').addClass('disabled');
+    $$('#agregarMateriaRegular').text('Agregando materia regularizada');
+    var idMateria = $$('#agregarRegularListaMaterias').val();
+    var nombreMateria = $$('#agregarRegularSeleccionarMateriaContenedor .item-after').text();
+    
+    console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria);
+
+    baseDeDatos = firebase.firestore();
+    var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
+    referenciaUsuario.get()
+        .then(function (doc) {
+            //Itero entre las carreras hasta encontrar la carreras seleccionada
+            for (var i = 0; i < doc.data().carreras.length; i++) {
+                if (doc.data().carreras[i].idCarrera == carreraSeleccionada) {
+                    var indice = i;
+                }
+            }
+            var carreraAModificar = doc.data().carreras[indice];
+            var carreraOriginal = doc.data().carreras[indice];
+
+
+            //Busco la materia seleccionada y guardo el índice
+            for (var j = 0; j < doc.data().carreras[indice].materiasPendientes.length; j++) {
+                if (doc.data().carreras[indice].materiasPendientes[j].idMateria == idMateria) {
+                    var indiceMateria = j;
+                }
+            }
+
+
+            //console.log(carreraAModificar);
+            console.log("Indice de materia: " + indiceMateria);
+
+
+            //Saco la materia elegida del array materiasPendientes
+            carreraAModificar.materiasPendientes.splice(indiceMateria, 1);
+            carreraAModificar.cantidadMateriasPendientes--;
+
+            //Creo el objeto materiaRegularizada
+            var materiaRegular = {
+                idMateria: idMateria,
+                nombreMateria: nombreMateria
+            };
+
+            //Actualizo el array materiasRegularizadas
+            if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
+                carreraAModificar.materiasRegulares.push(materiaRegular);
+            } else {
+                var materiasRegulares = [];
+                materiasRegulares.push(materiaRegular);
+                carreraAModificar["materiasRegulares"] = materiasRegulares;
+            }        
+
+            //Borro la materia del array
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera eliminada correctamente.");
+                    //mainView.router.navigate('/home/');
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera agregada correctamente.");
+                    var toastConfirmacionMateriaAgregada = app.toast.create({
+                        icon: '<i class="f7-icons">checkmark_alt</i>',
+                        text: 'Listo! Materia regular agregada correctamente.',
+                        position: 'center',
+                        closeTimeout: 2000,
+                    });
+                    toastConfirmacionMateriaAgregada.open();
+                    $$('#agregarMateriaRegular').removeClass('disabled');
+                    $$('#agregarMateriaRegular').text('Agregar materia');
+
+                    mainView.router.navigate('/home/');
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+
+
+
+        })
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
+
+
 
 }
 
@@ -411,19 +571,28 @@ function agregarMateriaAListaDeAprobadas() {
             var carreraAModificar = doc.data().carreras[indice];
             var carreraOriginal = doc.data().carreras[indice];
 
+            //La carrera puede estar en materiasPendientes o en materiasRegulares
+            var esMateriaPendiente=false;
 
             //Busco la materia seleccionada y guardo el índice
             for (var j = 0; j < doc.data().carreras[indice].materiasPendientes.length; j++) {
                 if (doc.data().carreras[indice].materiasPendientes[j].idMateria == idMateria) {
                     var indiceMateria = j;
+                    esMateriaPendiente = true;
                 }
             }
-
+            //Si el indiceMateria es undefined, es porque no se encontró la materia. Por lo tanto, está en materiasRegulares
+            if (typeof indiceMateria === 'undefined'){
+                for (var j = 0; j < doc.data().carreras[indice].materiasRegulares.length; j++) {
+                    if (doc.data().carreras[indice].materiasRegulares[j].idMateria == idMateria) {
+                        var indiceMateria = j;
+                    }
+                }
+            }
+            
 
             //console.log(carreraAModificar);
             console.log("Indice de materia: " + indiceMateria);
-            //Saco la materia elegida del array materiasPendientes
-            carreraAModificar.materiasPendientes.splice(indiceMateria, 1);
 
             //Creo el objeto materiaAprobada
             var materiaAprobada = {
@@ -435,6 +604,16 @@ function agregarMateriaAListaDeAprobadas() {
 
             //Actualizo el array materiasAprobadas
             carreraAModificar.materiasAprobadas.push(materiaAprobada);
+
+            if(esMateriaPendiente){
+                //Saco la materia elegida del array materiasPendientes
+                carreraAModificar.materiasPendientes.splice(indiceMateria, 1);
+                //Actualizo cantidad de materias pendientes para el progreso
+                carreraAModificar.cantidadMateriasPendientes--;
+            }else{
+                //Saco la materia elegida del array materiasRegulares
+                carreraAModificar.materiasRegulares.splice(indiceMateria, 1);
+            }
 
             var cantidadMateriasDesaprobadas;
             if (typeof carreraAModificar.materiasDesaprobadas !== 'undefined') {
@@ -448,16 +627,26 @@ function agregarMateriaAListaDeAprobadas() {
             var sumatoriaNotasActual = carreraAModificar.promedio * (totalMateriasParaPromedio);
             var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) + parseFloat(nota);
 
-            //Actualizo información del progreso
+            //Actualizo cantidad de materias aprobadas para el progreso
             carreraAModificar.cantidadMateriasAprobadas++;
-            carreraAModificar.cantidadMateriasPendientes--;
+            
             //Recalculo promedio
             var nuevoPromedio = (sumatoriaNotasNueva) / (totalMateriasParaPromedio + 1);
             //var nuevoPromedio = (sumatoriaNotasNueva) / (carreraAModificar.cantidadMateriasAprobadas);
             carreraAModificar.promedio = Math.round(nuevoPromedio * 10) / 10;
+
             //Recalculo progreso
-            var nuevoPorcentajeProgreso = (carreraAModificar.cantidadMateriasAprobadas / (carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes)) * 100;
-            nuevoPorcentajeProgreso = Math.round(nuevoPorcentajeProgreso * 10) / 10;
+            var totalMaterias;
+            var totalMateriasRegulares=0;
+            if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
+                totalMateriasRegulares=carreraAModificar.materiasRegulares.length;
+            }
+            totalMaterias=carreraAModificar.cantidadMateriasAprobadas+carreraAModificar.cantidadMateriasPendientes+totalMateriasRegulares;
+
+            var nuevoPorcentajeProgreso= recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas,totalMaterias);
+
+            //var nuevoPorcentajeProgreso = (carreraAModificar.cantidadMateriasAprobadas / (carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes)) * 100;
+            //nuevoPorcentajeProgreso = Math.round(nuevoPorcentajeProgreso * 10) / 10;
             carreraAModificar.progreso = nuevoPorcentajeProgreso;
 
             //Borro la materia del array
@@ -650,6 +839,44 @@ function agregarFinalDesaprobado() {
 
 }
 
+function generarTabsListadoMaterias(){
+    baseDeDatos = firebase.firestore();
+    var refUsuario = baseDeDatos.collection("Usuarios").doc(usuario);
+    refUsuario.get()
+    .then(function (doc) {
+        //Itero entre las carreras hasta encontrar la carreras seleccionada
+        for (var i = 0; i < doc.data().carreras.length; i++) {
+            if (doc.data().carreras[i].idCarrera == carreraSeleccionada) {
+                var indice = i;
+            }
+        }
+        /*if(doc.data().carreras[indice].materiasAprobadas.length!=0) {
+            $$("#listadoMateriasTabs").append("<a href='#tab-aprobadas' class='tab-link tab-link-active tabListadoMateria'>Aprobadas</a>");
+        }*/
+        //Siempre muestro la de materias aprobadas.
+        $$("#listadoMateriasTabs").append("<a href='#tab-aprobadas' class='tab-link tab-link-active tabListadoMateria'>Aprobadas</a>");
+        if(typeof doc.data().carreras[indice].materiasRegulares !== 'undefined') {
+            if(doc.data().carreras[indice].materiasRegulares.length!=0){
+                $$("#listadoMateriasTabs").append("<a href='#tab-regulares' class='tab-link tabListadoMateria'>Regulares</a>");
+            }
+            
+        }
+        if(doc.data().carreras[indice].materiasPendientes.length!=0) {
+            $$("#listadoMateriasTabs").append("<a href='#tab-pendientes' class='tab-link tabListadoMateria'>Pendientes</a>");
+        }
+        if(typeof doc.data().carreras[indice].materiasDesaprobadas !== 'undefined') {
+            if(doc.data().carreras[indice].materiasDesaprobadas.length!=0){
+                $$("#listadoMateriasTabs").append("<a href='#tab-desaprobadas' class='tab-link tabListadoMateria'>Desaprobadas</a>");
+            }
+            
+        }
+        listarMaterias();
+    })
+    .catch(function (error) {
+        console.log("Error getting documents: ", error);
+    });
+}
+
 function listarMaterias() {
     console.log("Carrera seleccionada: " + carreraSeleccionada);
     $$('#listaMateriasAprobadas').empty();
@@ -673,10 +900,29 @@ function listarMaterias() {
                 }
                 $$('#listaMateriasAprobadas').append('<li><a href="/materiaAprobada/' + doc.data().carreras[indice].materiasAprobadas[j].idMateria + '/' + nombreMateriaAprobada + '/' + doc.data().carreras[indice].materiasAprobadas[j].nota + '/' + doc.data().carreras[indice].materiasAprobadas[j].fechaAprobacion.toDate() + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasAprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasAprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
             }
+
+            //Listo las materias regulares
+            if(typeof doc.data().carreras[indice].materiasRegulares !== 'undefined') {
+                for (var j = 0; j < doc.data().carreras[indice].materiasRegulares.length; j++) {
+                    var nombreMateriaRegular = doc.data().carreras[indice].materiasRegulares[j].nombreMateria;
+                    if (nombreMateriaRegular.slice(-1) == ".") {
+                        nombreMateriaRegular = nombreMateriaRegular.slice(0, -1);
+                    }
+                    $$('#listaMateriasRegulares').append('<li><a href="/materiaRegular/' + doc.data().carreras[indice].materiasRegulares[j].idMateria + '/' + nombreMateriaRegular + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasRegulares[j].nombreMateria + '</div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
+                }
+            }
+            
+
+            if(doc.data().carreras[indice].materiasAprobadas.length==0){
+                $$('#listaMateriasAprobadas').append("<p>No hay materias aprobadas.</p>"); 
+            }
+
+            //Listo las materias pendientes
             var idMateriasPendientes = [];
             for (var k = 0; k < doc.data().carreras[indice].materiasPendientes.length; k++) {
                 idMateriasPendientes.push(doc.data().carreras[indice].materiasPendientes[k].idMateria);
             }
+
             //Voy a buscar a Materias la información restante
             var refMateria;
             var materias = [];
@@ -692,6 +938,7 @@ function listarMaterias() {
                             anio: doc2.data().anio,
                             disponible: doc2.data().disponible,
                             esCorrelativaDe: doc2.data().esCorrelativaDe,
+                            esCorrelativaDeRegulares:doc2.data().esCorrelativaDeRegulares,
                             nombre: doc2.data().nombre,
                             requiereCorrelativas: doc2.data().requiereCorrelativas,
                             idMateria: doc2.id
@@ -729,7 +976,9 @@ function listarMaterias() {
                             var todasAprobadas = true;
                             var materiaEncontrada;
                             var listaCorrelativas = "";
+                            var listaCorrelativasRegulares="";
 
+                            //Chequeo correlativas aprobadas (deben estar aprobadas)
                             for (j = 0; j < materias[i].esCorrelativaDe.length; j++) {
 
                                 materiaEncontrada = false;
@@ -739,6 +988,7 @@ function listarMaterias() {
                                         break;
                                     }
                                 }
+                                
                                 if (materiaEncontrada == false) {
                                     //Si la correlativa no fue encontrada en la lista de materias aprobadas, se lista
                                     todasAprobadas = false;
@@ -746,12 +996,47 @@ function listarMaterias() {
                                 }
                             }
 
+                            //Chequeo correlativas regulares (deben estar aprobadas o regulares)
+                            if(typeof materias[i].esCorrelativaDeRegulares !== 'undefined'){
+                                for (j = 0; j < materias[i].esCorrelativaDeRegulares.length; j++) {
+
+                                    materiaEncontrada = false;
+                                    //Busco primero si la materia está en la lista de regulares
+                                    if(typeof doc.data().carreras[indice].materiasRegulares !== 'undefined'){
+                                        for (var k = 0; k < doc.data().carreras[indice].materiasRegulares.length; k++) {
+                                            if (materias[i].esCorrelativaDeRegulares[j].trim() == doc.data().carreras[indice].materiasRegulares[k].nombreMateria.trim()) {
+                                                materiaEncontrada = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    
+    
+                                    //Si no está en la lista de regulares, la busco en la lista de aprobadas
+                                    if(materiaEncontrada == false){
+                                        for (var k = 0; k < doc.data().carreras[indice].materiasAprobadas.length; k++) {
+                                            if (materias[i].esCorrelativaDeRegulares[j].trim() == doc.data().carreras[indice].materiasAprobadas[k].nombreMateria.trim()) {
+                                                materiaEncontrada = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    
+                                    if (materiaEncontrada == false) {
+                                        //Si la correlativa no fue encontrada en la lista de materias aprobadas ni regulares, se lista
+                                        todasAprobadas = false;
+                                        listaCorrelativasRegulares += materias[i].esCorrelativaDeRegulares[j] + '|';
+                                    }
+                                }
+                            }
+                            
+
                             if (todasAprobadas == true) {
                                 //Si todas las correlativas fueron encontradas, se muestra Todas aprobadas.
                                 codigoHTMLLista += '<li><a href="/materiaPendiente/' + materias[i].idMateria + '/' + nombreMateriaPendiente + '/aprobadas/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas: Todas aprobadas.</div></div></div></a></li>';
                             } else {
                                 //var correlativasURL = listaCorrelativas.replace(' ', "_");
-                                codigoHTMLLista += '<li class="disabled" style="pointer-events:all !important;"><a href="/materiaPendiente/' + materias[i].idMateria + '/' + nombreMateriaPendiente + '/' + listaCorrelativas + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas restantes: ' + listaCorrelativas + '</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
+                                codigoHTMLLista += '<li class="disabled" style="pointer-events:all !important;"><a href="/materiaPendiente/' + materias[i].idMateria + '/' + nombreMateriaPendiente + '/' + listaCorrelativas + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + materias[i].nombre + '<div class="item-footer">Correlativas aprobadas restantes: ' + listaCorrelativas + '<br>Correlativas regulares restantes: '+listaCorrelativasRegulares+'</div></div><div class="item-after"><i class="f7-icons">lock</i></div></div></a></li>';
                             }
 
 
@@ -1161,7 +1446,110 @@ function moverMateriaDeAprobadasAPendientes() {
         });
 
 
-}
+};
+
+function moverMateriaDeRegularAPendientes() {
+    $$('#quitarMateriaRegular').addClass('disabled');
+    $$('#quitarMateriaRegular').text('Quitando materia');
+    var idMateria = $$('#materiaRegularIdMateria').val();
+  
+    //console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota);
+
+    baseDeDatos = firebase.firestore();
+    var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
+    referenciaUsuario.get()
+        .then(function (doc) {
+            //Itero entre las carreras hasta encontrar la carreras seleccionada
+            for (var i = 0; i < doc.data().carreras.length; i++) {
+                if (doc.data().carreras[i].idCarrera == carreraSeleccionada) {
+                    var indice = i;
+                }
+            }
+            var carreraAModificar = doc.data().carreras[indice];
+            var carreraOriginal = doc.data().carreras[indice];
+
+            //Busco la materia seleccionada y guardo el índice
+            for (var j = 0; j < doc.data().carreras[indice].materiasRegulares.length; j++) {
+                if (doc.data().carreras[indice].materiasRegulares[j].idMateria == idMateria) {
+                    var indiceMateria = j;
+                }
+            }
+
+            //Obtener Nombre materia desde la base de datos (Porque la que viene como dato puede no tener el punto final)
+            var nombreDeLaMateria = carreraAModificar.materiasRegulares[indiceMateria].nombreMateria;
+
+            //console.log(carreraAModificar);
+            console.log("Indice de materia: " + indiceMateria);
+
+            //Saco la materia elegida del array materiasRegulares
+            carreraAModificar.materiasRegulares.splice(indiceMateria, 1);
+
+            //Creo el objeto materiaRegular
+            var materiaRegular = {
+                idMateria: idMateria,
+                nombreMateria: nombreDeLaMateria
+            };
+
+            //Actualizo el array materiasPendientes
+            carreraAModificar.materiasPendientes.push(materiaRegular);
+            carreraAModificar.materiasPendientes.sort(compararMateriasPorNombre);
+
+            //Actualizo la cantidad de materias
+            carreraAModificar.cantidadMateriasPendientes++;
+
+            //Borro la materia del array
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera eliminada correctamente.");
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera quitada correctamente.");
+                    var toastConfirmacionMateriaRemovida = app.toast.create({
+                        icon: '<i class="f7-icons">checkmark_alt</i>',
+                        text: 'Materia quitada correctamente.',
+                        position: 'center',
+                        closeTimeout: 2000,
+                    });
+                    toastConfirmacionMateriaRemovida.open();
+                    $$('#quitarMateriaRegular').removeClass('disabled');
+                    $$('#quitarMateriaRegular').text('Quitar materia de regulares');
+                    mainView.router.navigate('/home/');
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+
+
+
+        })
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
+
+
+};
 
 function quitarMateriaDesaprobada() {
     $$('#quitarMateriaDesaprobada').addClass('disabled');
@@ -1266,6 +1654,13 @@ function quitarMateriaDesaprobada() {
         });
 
 
+}
+
+//Calculo progreso
+function recalcularProgreso(materiasAprobadas,totalMaterias){
+    var nuevoPorcentajeProgreso = (materiasAprobadas / (totalMaterias)) * 100;
+    nuevoPorcentajeProgreso = Math.round(nuevoPorcentajeProgreso * 10) / 10;
+    return nuevoPorcentajeProgreso;
 }
 
 //Detecto cambio en el <select> de Carreras en la Homepage

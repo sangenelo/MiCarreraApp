@@ -164,6 +164,9 @@
 .block-title.title-strong {
   font-weight: 600;
 }
+.tab-link{
+  font-size: 0.8em;
+}
 
 /* DETALLE MATERIA */
 

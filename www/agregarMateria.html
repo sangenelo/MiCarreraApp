@@ -4,7 +4,8 @@
         <div class="toolbar tabbar toolbar-bottom">
             <div class="toolbar-inner">
                 <a href="#tab-1" class="tab-link tab-link-active">Materia aprobada</a>
-                <a href="#tab-2" class="tab-link">Final desaprobado</a>
+                <a href="#tab-2" class="tab-link">Materia Regularizada</a>
+                <a href="#tab-3" class="tab-link">Final desaprobado</a>
             </div>
         </div>
         <div class="tabs-animated-wrap">
@@ -13,7 +14,7 @@
                     <div class="block">
                         <div class="row justify-content-center">
                             <div class="col-80">
-                                <h1 class="text-align-center">Agregar materia</h1>
+                                <h2 class="text-align-center">Agregar materia aprobada</h2>
                                 <div class="list">
                                     <ul>
                                         <li class="item-content item-input item-input-with-info"
@@ -81,7 +82,45 @@
                     <div class="block">
                         <div class="row justify-content-center">
                             <div class="col-80">
-                                <h1 class="text-align-center">Agregar final desaprobado</h1>
+                                <h2 class="text-align-center">Agregar materia regularizada</h2>
+                                <div class="list">
+                                    <ul>
+                                        <li class="item-content item-input item-input-with-info" id="agregarRegularSeleccionarMateriaContenedor">
+                                            <div class="item-inner">
+                                                <div class="item-title item-label">Seleccionar materia</div>
+                                                <div class="item-input-wrap">
+                                                    <a id="smart-select-regular" class="item-link smart-select smart-select-init" data-open-in="popup"
+                                                data-searchbar="true">
+                                                <select id="agregarRegularListaMaterias">
+                                                    <option value="">Elige una materia</option>
+                                                </select>
+                                                <div id="contenedorNombreMateriaRegular" class="item-content">
+                                                    <div class="item-inner">
+                                                        <div class="item-title"></div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                                <div class="item-input-error-message">Elegí una materia</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                       
+                                       
+                        
+                        
+                                    </ul>
+                                </div>
+                                <button id="agregarMateriaRegular" class="button button-fill">Agregar materia regularizada</button>
+                        
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                <div id="tab-3" class="page-content tab">
+                    <div class="block">
+                        <div class="row justify-content-center">
+                            <div class="col-80">
+                                <h2 class="text-align-center">Agregar final desaprobado</h2>
                                 <div class="list">
                                     <ul>
                                         <li class="item-content item-input item-input-with-info" id="agregarFinalSeleccionarMateriaContenedor">
