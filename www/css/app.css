@@ -113,6 +113,10 @@
   color: #FFF;
 }
 
+.boldText{
+  font-weight: 600;
+}
+
 /* Primer inicio */
 .elegirCarreraTitulo {
   margin-top: 30px;
@@ -260,7 +264,7 @@ text {
     height: 100%;
 }
 .contenedorImagenTutorial {
-    height: 70%;
+    height: 65%;
     text-align: center;
     margin-top: 10px;
 }
