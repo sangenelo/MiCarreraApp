@@ -147,11 +147,11 @@
 
 /* AGREGAR MATERIA */
 
-#contenedorNombreMateria,#contenedorNombreMateriaFinalDesaprobado{
+#contenedorNombreMateria,#contenedorNombreMateriaFinalDesaprobado, #contenedorNombreMateriaRegular{
   padding: 0;
 }
 
-#contenedorNombreMateria .item-after,#contenedorNombreMateriaFinalDesaprobado .item-after{
+#contenedorNombreMateria .item-after,#contenedorNombreMateriaFinalDesaprobado .item-after,#contenedorNombreMateriaRegular .item-after{
   margin:0 !important;
   padding: 0 !important;
 }
@@ -166,6 +166,13 @@
 }
 .tab-link{
   font-size: 0.8em;
+}
+.noHayMaterias {
+  color: #cecece;
+  text-align: center;
+}
+.noHayMaterias i {
+  font-size: 2em;
 }
 
 /* DETALLE MATERIA */

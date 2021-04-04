@@ -126,5 +126,16 @@ function cargarCarrera(){
 
 }
 
+function borrarMateria(materiaABorrar){
+    baseDeDatos = firebase.firestore();
+    refMateria = baseDeDatos.collection('Materias').doc(materiaABorrar);
+    refMateria.delete().then(() => {
+        console.log("Materia "+materiaABorrar+" borrada correctamente.");
+    }).catch((error) => {
+        console.error("Error removing document: ", error);
+    });
+    
+}
+
 
 

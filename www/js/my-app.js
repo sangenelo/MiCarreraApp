@@ -51,7 +51,7 @@ var app = new Framework7({
       url: 'agregarMateria.html'
     },
     {
-      path: '/materiaPendiente/:idMateria/:nombreMateria/:correlativas/',
+      path: '/materiaPendiente/:idMateria/:nombreMateria/:correlativas/:correlativasRegulares/',
       url: 'materiaPendiente.html'
     },
     {
@@ -378,9 +378,10 @@ $$(document).on('page:beforein', '.page[data-name="materiaPendiente"]', function
 
 $$(document).on('page:init', '.page[data-name="materiaPendiente"]', function (e) {
   var materiasCorrelativasRestantes = app.view.main.router.currentRoute.params.correlativas;
+  var materiasCorrelativasRegularesRestantes = app.view.main.router.currentRoute.params.correlativasRegulares;
   var nombreMateria = app.view.main.router.currentRoute.params.nombreMateria;
   idMateriaRuta = app.view.main.router.currentRoute.params.idMateria;
-  mostrarDatosMateriaPendiente(nombreMateria, materiasCorrelativasRestantes);
+  mostrarDatosMateriaPendiente(nombreMateria, materiasCorrelativasRestantes,materiasCorrelativasRegularesRestantes);
 
   $$('body').on('click', '#irAAgregarMateria', function () {
     mainView.router.navigate('/agregarMateria/' + idMateriaRuta + '/');
@@ -710,6 +711,14 @@ $$(document).on('page:init', '.page[data-name="adminHome"]', function (e) {
     var usuarioAReparar = $$("#usuarioAReparar").val();
     repararUsuariosConMayuscula(usuarioAReparar);
   });
+
+  $$('#borrarMateriaSeleccionada').on('click', function () {
+    var materiaABorrar = $$("#materiaABorrar").val();
+    borrarMateria(materiaABorrar);
+  });
+
+  
+
 });
 
 /* TUTORIAL */
