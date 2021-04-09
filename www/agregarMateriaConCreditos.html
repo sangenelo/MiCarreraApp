@@ -1,0 +1,79 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="agregarMateriaConCreditos">
+    <div class="page-content login-screen-content">
+
+        <div class="block">
+            <div class="row justify-content-center">
+                <div class="col-80">
+                    <h2 class="text-align-center">Agregar materia/curso con créditos</h2>
+                    <div class="list">
+                        <ul>
+                            <li class="item-content item-input item-input-with-info"
+                                id="agregarMateriaConCreditosNombreMateriaContenedor">
+
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Nombre materia/curso</div>
+                                    <div class="item-input-wrap">
+                                        <input id="agregarMateriaConCreditosNombreMateria" type="text" placeholder="Nombre materia">
+                                        <span class="input-clear-button"></span>
+                                        <div class="item-input-error-message">Nombre incorrecto. No debe contener caracteres especiales.</div>
+                                    </div>
+                                </div>
+
+                            </li>
+                            <li class="item-content item-input item-input-with-info" id="agregarMateriaConCreditosFechaAprobacionContenedor">
+                                 <div class="item-inner">
+                                    <div class="item-title item-label">Fecha de aprobación</div>
+                                    <div class="item-input-wrap">
+                                        <input type="text" placeholder="¿Cuándo aprobaste?" readonly="readonly"
+                                            id="agregarMateriaConCreditosFechaAprobacion" />
+                                        <span class="input-clear-button"></span>
+                                        <div class="item-input-error-message">Tenés que ingresar una fecha.
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </li>
+                            <li class="item-content item-input item-input-with-info" id="agregarMateriaConCreditosCalificacionContenedor">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Tipo de calificación</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select id="agregarMateriaConCreditosCalificacion">
+                                            <option value="nota">Nota</option>
+                                            <option value="aprobado">Aprobado</option>
+                                        </select>
+                                        <div class="item-input-error-message">La nota debe estar entre 4 y 10</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item-content item-input item-input-with-info" id="agregarMateriaConCreditosNotaContenedor">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Nota</div>
+                                    <div class="item-input-wrap">
+                                        <input id="agregarMateriaConCreditosNota" min="4" max="10" type="number"
+                                            placeholder="Ingrese la nota (Entre 4 y 10)">
+                                        <span class="input-clear-button"></span>
+                                        <div class="item-input-error-message">La nota debe estar entre 4 y 10</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="item-content item-input item-input-with-info" id="agregarMateriaConCreditosCreditosContenedor">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Créditos</div>
+                                    <div class="item-input-wrap">
+                                        <input id="agregarMateriaConCreditosCreditos" min="1" type="number" placeholder="Ingrese los créditos otorgados">
+                                        <span class="input-clear-button"></span>
+                                        <div class="item-input-error-message">Debe sumar al menos 1 crédito.</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <button id="agregarMateriaConCreditos" class="button button-fill">Agregar materia</button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -61,6 +61,55 @@ function validarFinalDesAprobado() {
 
 };
 
+function validarMateriaConCreditos() {
+    var nombreMateria = $$('#agregarMateriaConCreditosNombreMateria').val();
+    var fechaAprobacion = $$('#agregarMateriaConCreditosFechaAprobacion').val();
+    var tipoDeCalificacion = $$("#agregarMateriaConCreditosCalificacion").val();
+    var nota = $$('#agregarMateriaConCreditosNota').val();
+    var creditos=$$("#agregarMateriaConCreditosCreditos").val();
+    const nombreMateriaRegex = /^([a-zA-Z0-9\u00f1\u00d1\u00E0-\u00FC ]+)$/;
+    var testeoNombreMateria = nombreMateriaRegex.test(nombreMateria);
+    var huboError=false;
+
+    if (!testeoNombreMateria || nombreMateria.length<1) {
+        $$('#agregarMateriaConCreditosNombreMateriaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#agregarMateriaConCreditosNombreMateriaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    
+    if(fechaAprobacion.length<1){
+        $$('#agregarMateriaConCreditosFechaAprobacionContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#agregarMateriaConCreditosFechaAprobacionContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+
+    if(tipoDeCalificacion=="nota"){
+        if(nota<4 || nota >10){
+            $$('#agregarMateriaConCreditosNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
+            huboError=true;
+        }else{
+            $$('#agregarMateriaConCreditosNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+        }
+    }
+    
+    
+    if(creditos<1 || creditos >100){
+        $$('#agregarMateriaConCreditosCreditosContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#agregarMateriaConCreditosCreditosContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    
+   
+    if(!huboError){
+        agregarMateriaAListaDeMateriasConCreditos();
+    }
+
+
+};
+
 function validarActualizacionMateriaAprobada(){
     var idMateria = $$('#materiaAprobadaIdMateria').val();
     var fechaAprobacion = $$('#materiaAprobadaFecha').val();

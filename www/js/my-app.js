@@ -51,6 +51,10 @@ var app = new Framework7({
       url: 'agregarMateria.html'
     },
     {
+      path: '/agregarMateriaConCreditos/',
+      url: 'agregarMateriaConCreditos.html'
+    },
+    {
       path: '/materiaPendiente/:idMateria/:nombreMateria/:correlativas/:correlativasRegulares/',
       url: 'materiaPendiente.html'
     },
@@ -65,6 +69,10 @@ var app = new Framework7({
     {
       path: '/materiaRegular/:idMateria/:nombreMateria/',
       url: 'materiaRegular.html'
+    },
+    {
+      path: '/materiaConCreditos/:idMateria/:nombreMateria/:nota/:fecha/:creditos/',
+      url: 'materiaConCreditos.html'
     },
     {
       path: '/miPerfil/',
@@ -366,6 +374,28 @@ $$(document).on('page:init', '.page[data-name="agregarMateria"]', function (e) {
 
 
 $$(document).on('page:beforeout', '.page[data-name="agregarMateria"]', function (e) {
+  $$('.botonAtras').addClass('oculto');
+  $$('.menuIconContenedor').removeClass('oculto');
+})
+
+
+$$(document).on('page:init', '.page[data-name="agregarMateriaConCreditos"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+  
+  var calendarioMateriaConCreditos = app.calendar.create({
+    inputEl: '#agregarMateriaConCreditosFechaAprobacion',
+    dateFormat: 'mm/dd/yyyy'
+  });
+  $$('#agregarMateriaConCreditos').on('click', function () {
+    validarMateriaConCreditos();
+  });
+ 
+})
+
+
+
+$$(document).on('page:beforeout', '.page[data-name="agregarMateriaConCreditos"]', function (e) {
   $$('.botonAtras').addClass('oculto');
   $$('.menuIconContenedor').removeClass('oculto');
 })
