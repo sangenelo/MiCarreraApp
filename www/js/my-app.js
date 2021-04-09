@@ -378,14 +378,24 @@ $$(document).on('page:beforeout', '.page[data-name="agregarMateria"]', function 
   $$('.menuIconContenedor').removeClass('oculto');
 })
 
-
-$$(document).on('page:init', '.page[data-name="agregarMateriaConCreditos"]', function (e) {
+$$(document).on('page:beforein', '.page[data-name="agregarMateriaConCreditos"]', function (e) {
   $$('.botonAtras').removeClass('oculto');
   $$('.menuIconContenedor').addClass('oculto');
-  
+});
+
+$$(document).on('page:init', '.page[data-name="agregarMateriaConCreditos"]', function (e) {
   var calendarioMateriaConCreditos = app.calendar.create({
     inputEl: '#agregarMateriaConCreditosFechaAprobacion',
     dateFormat: 'mm/dd/yyyy'
+  });
+  var tipoDeCalificacionElegida;
+  $$('body').on('change', '#agregarMateriaConCreditosCalificacion', function () {
+    tipoDeCalificacionElegida = $$('#agregarMateriaConCreditosCalificacion').val();
+    if(tipoDeCalificacionElegida=="aprobado"){
+      $$("#agregarMateriaConCreditosNotaContenedor").hide();
+    }else{
+      $$("#agregarMateriaConCreditosNotaContenedor").show();
+    }
   });
   $$('#agregarMateriaConCreditos').on('click', function () {
     validarMateriaConCreditos();
@@ -510,7 +520,51 @@ $$(document).on('page:init', '.page[data-name="materiaRegular"]', function (e) {
   });
 
 
+});
+
+
+$$(document).on('page:beforein', '.page[data-name="materiaConCreditos"]', function (e) {
+  $$('.botonAtras').removeClass('oculto');
+  $$('.menuIconContenedor').addClass('oculto');
+  var idMateriaConCreditos = '';
+  var nombreMateriaConCreditos = '';
+  var notaMateriaConCreditos = '';
+  var fechaMateriaConCreditos = '';
+  var creditosMateriaConCreditos = '';
 })
+
+$$(document).on('page:init', '.page[data-name="materiaConCreditos"]', function (e) {
+  idMateriaConCreditos = app.view.main.router.currentRoute.params.idMateria;
+  nombreMateriaConCreditos = app.view.main.router.currentRoute.params.nombreMateria;
+  notaMateriaConCreditos = app.view.main.router.currentRoute.params.nota;
+  fechaMateriaConCreditos = app.view.main.router.currentRoute.params.fecha;
+  creditosMateriaConCreditos = app.view.main.router.currentRoute.params.creditos;
+
+  var calendarDefault = app.calendar.create({
+    inputEl: '#materiaConCreditosFecha',
+    dateFormat: 'mm/dd/yyyy',
+    value: [fechaMateriaConCreditos]
+  });
+
+  $$('#materiaConCreditosIdMateria').val(idMateriaConCreditos);
+  $$('#materiaConCreditosNombreMateria').text(nombreMateriaConCreditos);
+  $$('#materiaConCreditosNota').val(notaMateriaConCreditos);
+  if(notaMateriaConCreditos == -1){
+    $$('#materiaConCreditosAprobadoContenedor').removeClass("oculto");
+    $$('#materiaConCreditosNotaContenedor').addClass("oculto");
+  }
+  $$('#materiaConCreditosCreditos').val(creditosMateriaConCreditos);
+
+  $$('#actualizarMateriaConCreditos').on('click', function () {
+    validarActualizacionMateriaConCreditos();
+  })
+
+  $$('#quitarMateriaConCreditos').on('click', function () {
+    app.dialog.confirm('La materia se eliminará', '¿Estás segurx?', function () {
+      eliminarMateriaConCreditos();
+    });
+  });
+});
 
 $$(document).on('page:beforein', '.page[data-name="miPerfil"]', function (e) {
   $$('.botonAtras').addClass('oculto');

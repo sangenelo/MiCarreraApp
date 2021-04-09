@@ -1,0 +1,60 @@
+<!-- We don't need a full layout in this file because this page will be parsed with Ajax.  -->
+<div class="page" data-name="materiaConCreditos">
+    <div class="page-content login-screen-content">
+        <div class="row justify-content-center">
+            <div class="col-80">
+                <h2 id="materiaConCreditosNombreMateria" class="text-align-center"></h2>
+                <div class="list">
+                    <ul>
+                        <input type="hidden" id="materiaConCreditosIdMateria" value="">
+                        
+                        <li class="item-content item-input item-input-with-info" id="agregarMateriaConCreditosSeleccionarFechaContenedor">
+                            
+                              <div class="item-inner">
+                                <div class="item-title item-label">Fecha de aprobación</div>
+                                <div class="item-input-wrap">
+                                  <input type="text" placeholder="¿Cuándo aprobaste?" readonly="readonly" id="materiaConCreditosFecha"/>
+                                  <span class="input-clear-button"></span>
+                                <div class="item-input-error-message">Tenés que ingresar una fecha.</div>
+                                </div>
+                              </div>
+                            
+                          </li>
+                        <li class="item-content item-input item-input-with-info" id="materiaConCreditosNotaContenedor">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nota</div>
+                                <div class="item-input-wrap">
+                                    <input id="materiaConCreditosNota" min="4" max="10" type="number" placeholder="Ingrese la nota (Entre 4 y 10)">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">La nota debe estar entre 4 y 10</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info oculto" id="materiaConCreditosAprobadoContenedor">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nota</div>
+                                <div class="item-input-wrap">
+                                    <input id="materiaConCreditosAprobado" type="text" value="Aprobado" readonly>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input item-input-with-info" id="materiaConCreditosCreditoContenedor">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Créditos</div>
+                                <div class="item-input-wrap">
+                                    <input id="materiaConCreditosCreditos" min="1" type="number" placeholder="Ingrese los créditos otorgados.">
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-error-message">Debe sumar al menos 1 crédito.</div>
+                                </div>
+                            </div>
+                        </li>
+
+
+                    </ul>
+                </div>
+                <button id="actualizarMateriaConCreditos" class="button button-fill ">Actualizar materia</button>
+                <button id="quitarMateriaConCreditos" class="button button-fill color-red margin-top">Quitar materia</button>
+            </div>
+        </div>
+    </div>
+</div>

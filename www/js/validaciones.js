@@ -145,6 +145,44 @@ function validarActualizacionMateriaAprobada(){
 
 }
 
+function validarActualizacionMateriaConCreditos(){
+    var idMateria = $$('#materiaConCreditosIdMateria').val();
+    var fechaAprobacion = $$('#materiaConCreditosFecha').val();
+    var nota = $$('#materiaConCreditosNota').val();
+    var creditos = $$('#materiaConCreditosCreditos').val();
+    var huboError=false;
+
+    if (idMateria.length<1) {
+        huboError=true;
+    }
+    
+    if(fechaAprobacion.length<1){
+        $$('#agregarMateriaConCreditosSeleccionarFechaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#agregarMateriaConCreditosSeleccionarFechaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    
+    if(nota<4 || nota >10){
+        $$('#materiaConCreditosNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#materiaConCreditosNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    if(creditos<1 || creditos >100){
+        $$('#materiaConCreditosCreditoContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#materiaConCreditosCreditoContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    
+   
+    if(!huboError){
+        actualizarMateriaConCreditos();
+    }
+
+}
+
 function validarActualizacionMateriaDesaprobada(){
     var idMateria = $$('#materiaDesaprobadaIdMateria').val();
     var nota = $$('#materiaDesaprobadaNota').val();

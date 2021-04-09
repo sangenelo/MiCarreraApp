@@ -1273,7 +1273,7 @@ function listarMateriasConCreditos() {
                     if (notaMateriaConCredito == -1) {
                         notaMateriaConCredito = "Aprobado";
                     }
-                    $$('#listaMateriasConCreditos').append('<li><a href="/materiaConCreditos/' + doc.data().carreras[indice].materiasConCreditos[j].idMateria + '/' + doc.data().carreras[indice].materiasConCreditos[j].nombre + '/' + doc.data().carreras[indice].materiasConCreditos[j].nota + '/' + doc.data().carreras[indice].materiasConCreditos[j].fechaAprobacion.toDate() + '/' + doc.data().carreras[indice].materiasConCreditos[j].creditos + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasConCreditos[j].nombreMateria + '<div class="item-footer">Nota: ' + notaMateriaConCredito + '<br>Créditos: ' + doc.data().carreras[indice].materiasConCreditos[j].creditos + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
+                    $$('#listaMateriasConCreditos').append('<li><a href="/materiaConCreditos/' + doc.data().carreras[indice].materiasConCreditos[j].idMateria + '/' + doc.data().carreras[indice].materiasConCreditos[j].nombreMateria + '/' + doc.data().carreras[indice].materiasConCreditos[j].nota + '/' + doc.data().carreras[indice].materiasConCreditos[j].fechaAprobacion.toDate() + '/' + doc.data().carreras[indice].materiasConCreditos[j].creditos + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasConCreditos[j].nombreMateria + '<div class="item-footer">Nota: ' + notaMateriaConCredito + '<br>Créditos: ' + doc.data().carreras[indice].materiasConCreditos[j].creditos + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
                 }
             }
 
@@ -1410,6 +1410,108 @@ function actualizarMateriaAprobada() {
                     toastConfirmacionMateriaActualizada.open();
                     $$('#actualizarMateriaAprobada').removeClass('disabled');
                     $$('#actualizarMateriaAprobada').text('Actualizar materia');
+                    mainView.router.navigate('/home/');
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+
+
+
+        })
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
+}
+
+function actualizarMateriaConCreditos(){
+    $$('#actualizarMateriaConCreditos').addClass('disabled');
+    $$('#actualizarMateriaConCreditos').text('Actualizando materia');
+    var idMateria = $$('#materiaConCreditosIdMateria').val();
+    var fechaAprobacion = $$('#materiaConCreditosFecha').val();
+    var nota = $$('#materiaConCreditosNota').val();
+    var nombreMateria = $$('#materiaConCreditosNombreMateria').text();
+    var fechaAprobacionTimeStamp = firebase.firestore.Timestamp.fromDate(new Date(fechaAprobacion));
+    var creditos = parseInt($$('#materiaConCreditosCreditos').val());
+
+    console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota+" Creditos: "+creditos);
+
+    baseDeDatos = firebase.firestore();
+    var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
+    referenciaUsuario.get()
+        .then(function (doc) {
+            //Itero entre las carreras hasta encontrar la carreras seleccionada
+            for (var i = 0; i < doc.data().carreras.length; i++) {
+                if (doc.data().carreras[i].idCarrera == carreraSeleccionada) {
+                    var indice = i;
+                }
+            }
+            var carreraAModificar = doc.data().carreras[indice];
+            var carreraOriginal = doc.data().carreras[indice];
+            //Busco la materia seleccionada y guardo el índice
+            for (var j = 0; j < doc.data().carreras[indice].materiasConCreditos.length; j++) {
+                if (doc.data().carreras[indice].materiasConCreditos[j].idMateria == idMateria) {
+                    var indiceMateria = j;
+                }
+            }
+
+            //console.log(carreraAModificar);
+            console.log("Indice de materia: " + indiceMateria);
+
+            var notaAnterior = carreraAModificar.materiasConCreditos[indiceMateria].nota;
+            var creditosAnteriores= carreraAModificar.materiasConCreditos[indiceMateria].creditos;
+            console.log("Nota anterior: " + notaAnterior+" Creditos anteriores: "+creditosAnteriores);
+
+            var nuevoPromedio=calcularPromedio(carreraAModificar,nota,'=',notaAnterior);
+            carreraAModificar.promedio=nuevoPromedio;
+
+            //Actualizo los créditos obtenidos
+            carreraAModificar.creditosObtenidos-=creditosAnteriores;
+            carreraAModificar.creditosObtenidos+=creditos;
+
+            //Modifico la materia elegida del array materiasConCreditos
+            carreraAModificar.materiasConCreditos[indiceMateria].fechaAprobacion = fechaAprobacionTimeStamp;
+            carreraAModificar.materiasConCreditos[indiceMateria].nota = nota;
+            carreraAModificar.materiasConCreditos[indiceMateria].creditos = creditos;
+
+            //Borro la materia del array
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera eliminada correctamente.");
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera agregada correctamente.");
+                    var toastConfirmacionMateriaActualizada = app.toast.create({
+                        icon: '<i class="f7-icons">checkmark_alt</i>',
+                        text: 'Materia actualizada correctamente.',
+                        position: 'center',
+                        closeTimeout: 2000,
+                    });
+                    toastConfirmacionMateriaActualizada.open();
+                    $$('#actualizarMateriaConCreditos').removeClass('disabled');
+                    $$('#actualizarMateriaConCreditos').text('Actualizar materia');
                     mainView.router.navigate('/home/');
 
                 })
@@ -1643,6 +1745,101 @@ function moverMateriaDeAprobadasAPendientes() {
 
 
 };
+
+function eliminarMateriaConCreditos(){
+    $$('#quitarMateriaConCreditos').addClass('disabled');
+    $$('#quitarMateriaConCreditos').text('Quitando materia');
+    var idMateria = $$('#materiaConCreditosIdMateria').val();
+    var creditos= parseInt($$('#materiaConCreditosCreditos').val());
+
+    baseDeDatos = firebase.firestore();
+    var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
+    referenciaUsuario.get()
+        .then(function (doc) {
+            //Itero entre las carreras hasta encontrar la carreras seleccionada
+            for (var i = 0; i < doc.data().carreras.length; i++) {
+                if (doc.data().carreras[i].idCarrera == carreraSeleccionada) {
+                    var indice = i;
+                }
+            }
+            var carreraAModificar = doc.data().carreras[indice];
+            var carreraOriginal = doc.data().carreras[indice];
+            //Busco la materia seleccionada y guardo el índice
+            for (var j = 0; j < doc.data().carreras[indice].materiasConCreditos.length; j++) {
+                if (doc.data().carreras[indice].materiasConCreditos[j].idMateria == idMateria) {
+                    var indiceMateria = j;
+                }
+            }
+
+            console.log("Indice de materia: " + indiceMateria);
+
+            var notaEliminada = carreraAModificar.materiasConCreditos[indiceMateria].nota;
+
+            console.log("idMateria: " + idMateria + " Nota: " + notaEliminada);
+
+            //Saco la materia elegida del array materiasConCreditos
+            carreraAModificar.materiasConCreditos.splice(indiceMateria, 1);
+
+            //Actualizo los creditosObtenidos 
+            carreraAModificar.creditosObtenidos-=creditos;
+            
+            //Si la nota es numérica, actualizo promedio
+            if(notaEliminada!=-1){
+                var nuevoPromedio=calcularPromedio(carreraAModificar,0,'-',notaEliminada);
+                carreraAModificar.promedio=nuevoPromedio;
+            }
+
+            //Borro la materia del array
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera eliminada correctamente.");
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+            referenciaUsuario.update({
+                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+            })
+
+
+                .then(function () {
+
+                    console.log("Carrera quitada correctamente.");
+                    var toastConfirmacionMateriaRemovida = app.toast.create({
+                        icon: '<i class="f7-icons">checkmark_alt</i>',
+                        text: 'Materia quitada correctamente.',
+                        position: 'center',
+                        closeTimeout: 2000,
+                    });
+                    toastConfirmacionMateriaRemovida.open();
+                    $$('#quitarMateriaConCreditos').removeClass('disabled');
+                    $$('#quitarMateriaConCreditos').text('Quitar materia');
+                    mainView.router.navigate('/home/');
+
+                })
+                .catch(function (error) {
+
+                    console.log("Error: " + error);
+
+                });
+
+
+
+
+        })
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
+}
 
 function moverMateriaDeRegularAPendientes() {
     $$('#quitarMateriaRegular').addClass('disabled');
