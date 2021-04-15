@@ -50,6 +50,14 @@ function compararMateriasPorNota(mat1, mat2) {
 var idCarreraElegida;
 var nombreCarreraElegida;
 
+var toastCBCBottom = app.toast.create({
+    text: 'Las materias del CBC no afectan al promedio',
+    closeTimeout: 3000,
+    closeButton: true,
+    closeButtonText: '¡Entendido!',
+  });
+
+
 //Funciones
 
 function cargarCarreras() {
@@ -355,7 +363,7 @@ function cargarPorcentajeCarrera(idCarrera) {
                         cantidadRegulares = doc.data().carreras[i].materiasRegulares.length;
                     }
                     var porcentajeProgreso = doc.data().carreras[i].progreso;
-                    $$('#detalleProgreso').text('Hiciste ' + cantidadAprobadas + ' de ' + (cantidadPendientes + cantidadAprobadas + cantidadRegulares) + ' materias. (' + porcentajeProgreso + '%)');
+                    $$('#detalleProgreso').text('Hiciste ' + cantidadAprobadas + ' de ' + (cantidadPendientes + cantidadAprobadas + cantidadRegulares) + ' materias. (' + porcentajeProgreso + '%) ');
                     $$('#preloaderHome').addClass('oculto');
                     $$('#contenedorProgresoCarrera ul').removeClass('escondido');
 
@@ -367,6 +375,30 @@ function cargarPorcentajeCarrera(idCarrera) {
                         value: promedioEnPorcentaje,
                         valueText: doc.data().carreras[i].promedio
                     });
+
+                    //Tooltip de progreso
+                    app.tooltip.destroy("#progresoAyuda");
+                    var textoTooltip = "";
+                    textoTooltip += "Para recibirte te falta";
+                    var textoY = "";
+                    var cantidadMateriasQueFaltan = cantidadPendientes + cantidadRegulares;
+                    if (cantidadMateriasQueFaltan > 0) {
+                        textoTooltip += " aprobar " + cantidadMateriasQueFaltan + " materia/s";
+                        textoY = " y";
+                    }
+
+                    if (typeof doc.data().carreras[i].creditosNecesarios !== 'undefined') {
+                        if (doc.data().carreras[i].creditosObtenidos < doc.data().carreras[i].creditosNecesarios) {
+                            textoTooltip += textoY;
+                            textoTooltip += " sumar " + (doc.data().carreras[i].creditosNecesarios - doc.data().carreras[i].creditosObtenidos) + " créditos"
+                        }
+                    }
+                    textoTooltip += ".";
+                    var progresoTooltip = app.tooltip.create({
+                        targetEl: '#progresoAyuda',
+                        text: textoTooltip,
+                        trigger: 'click'
+                    });
                 }
             }
         })
@@ -374,6 +406,7 @@ function cargarPorcentajeCarrera(idCarrera) {
             console.log("Error getting documents: ", error);
         });
 }
+
 
 function cargarMateriasPendientesEnAgregarMateria(materiaPasadaPorRuta) {
     console.log("Carrera seleccionada: " + carreraSeleccionada);
@@ -619,10 +652,16 @@ function agregarMateriaAListaDeAprobadas() {
             //La carrera puede estar en materiasPendientes o en materiasRegulares
             var esMateriaPendiente = false;
 
+            var anioMateria = -1;
+
             //Busco la materia seleccionada y guardo el índice
             for (var j = 0; j < doc.data().carreras[indice].materiasPendientes.length; j++) {
                 if (doc.data().carreras[indice].materiasPendientes[j].idMateria == idMateria) {
                     var indiceMateria = j;
+                    if (typeof doc.data().carreras[indice].materiasPendientes[j].anio !== 'undefined') {
+                        anioMateria = doc.data().carreras[indice].materiasPendientes[j].anio;
+                    }
+
                     esMateriaPendiente = true;
                 }
             }
@@ -631,9 +670,14 @@ function agregarMateriaAListaDeAprobadas() {
                 for (var j = 0; j < doc.data().carreras[indice].materiasRegulares.length; j++) {
                     if (doc.data().carreras[indice].materiasRegulares[j].idMateria == idMateria) {
                         var indiceMateria = j;
+                        if (typeof doc.data().carreras[indice].materiasRegulares[j].anio !== 'undefined') {
+                            anioMateria = doc.data().carreras[indice].materiasRegulares[j].anio;
+                        }
+
                     }
                 }
             }
+
 
 
             //console.log(carreraAModificar);
@@ -644,7 +688,8 @@ function agregarMateriaAListaDeAprobadas() {
                 idMateria: idMateria,
                 nombreMateria: nombreMateria,
                 fechaAprobacion: fechaAprobacionTimeStamp,
-                nota: nota
+                nota: nota,
+                anio: anioMateria
             };
 
             //Actualizo el array materiasAprobadas
@@ -662,95 +707,121 @@ function agregarMateriaAListaDeAprobadas() {
 
             //Actualizo cantidad de materias aprobadas para el progreso
             carreraAModificar.cantidadMateriasAprobadas++;
-            
-            var nuevoPromedio=calcularPromedio(carreraAModificar,nota,'+',0);
-            carreraAModificar.promedio=nuevoPromedio;
 
-            //Recalculo progreso
-            var totalMaterias;
-            var totalMateriasRegulares = 0;
-            if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
-                totalMateriasRegulares = carreraAModificar.materiasRegulares.length;
-            }
-            totalMaterias = carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes + totalMateriasRegulares;
+            //var nuevoPromedio = calcularPromedio(carreraAModificar, nota, '+', 0, idMateria);
+            //carreraAModificar.promedio = nuevoPromedio;
 
-            var nuevoPorcentajeProgreso = recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas, totalMaterias);
-
-            carreraAModificar.progreso = nuevoPorcentajeProgreso;
-
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
-
-
-                .then(function () {
-
-                    console.log("Carrera eliminada correctamente.");
-                    //mainView.router.navigate('/home/');
-
-                })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
-
-
-                .then(function () {
-
-                    console.log("Carrera agregada correctamente.");
-                    var toastConfirmacionMateriaAgregada = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: '¡Felicitaciones! Materia agregada correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
-                    });
-                    toastConfirmacionMateriaAgregada.open();
-                    $$('#agregarMateriaAprobada').removeClass('disabled');
-                    $$('#agregarMateriaAprobada').text('Agregar materia');
-
-                    //Medallas
-                    if (nota == 10) {
-                        verificarMedalla("medallaDiego", 0);
+            calcularPromedio(carreraAModificar, nota, '+', 0, idMateria).
+                then(nuevoPromedio => {
+                    console.log("El promedio devuelto es: " + nuevoPromedio);
+                    carreraAModificar.promedio = nuevoPromedio;
+                    //Recalculo progreso
+                    var totalMaterias;
+                    var totalMateriasRegulares = 0;
+                    if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
+                        totalMateriasRegulares = carreraAModificar.materiasRegulares.length;
                     }
-                    //Verifico si es la primer materia aprobada (Para asignar medalla)
-                    if (parseInt(carreraOriginal.cantidadMateriasAprobadas) == 0) {
-                        verificarMedalla("medallaPrimerPaso", 1);
+                    totalMaterias = carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes + totalMateriasRegulares;
+
+                    var carreraConCreditos = false;
+                    if (typeof carreraAModificar.creditosNecesarios !== 'undefined') {
+                        carreraConCreditos = true;
                     }
 
-                    //Verifico el porcentaje
-                    if (carreraAModificar.progreso >= 25 && carreraAModificar.progreso < 35) {
-                        verificarMedalla("medallaPrimerCuarto", 2);
-                    } else if (carreraAModificar.progreso >= 50 && carreraAModificar.progreso < 65) {
-                        verificarMedalla("medallaMitad", 3);
-                    } else if (carreraAModificar.progreso >= 75 && carreraAModificar.progreso < 85) {
-                        verificarMedalla("medalla75", 4);
-                    }
+                    var nuevoPorcentajeProgreso = recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas, totalMaterias, carreraConCreditos);
 
-                    //Si se recicibió
+                    carreraAModificar.progreso = nuevoPorcentajeProgreso;
+
+                    var seRecibio = false;
+                    //Si se aprobaron todas las materias verifico que estén todos los créditos para llevar el progreso a 100
                     if (carreraAModificar.cantidadMateriasPendientes == 0) {
-                        confetti.start();
-                        setTimeout(function () { confetti.stop(); }, 10000);
-                        verificarMedalla("medallaGraduado", 5);
+                        if (carreraConCreditos == true) {
+                            if (carreraAModificar.creditosObtenidos >= carreraAModificar.creditosNecesarios) {
+                                carreraAModificar.progreso = 100;
+                                seRecibio = true;
+                            }
+                        } else {
+                            seRecibio = true;
+                        }
+
                     }
 
-                    mainView.router.navigate('/home/');
+                    //Borro la materia del array
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                    })
 
+
+                        .then(function () {
+
+                            console.log("Carrera eliminada correctamente.");
+                            //mainView.router.navigate('/home/');
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
+
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                    })
+
+
+                        .then(function () {
+
+                            console.log("Carrera agregada correctamente.");
+                            var toastConfirmacionMateriaAgregada = app.toast.create({
+                                icon: '<i class="f7-icons">checkmark_alt</i>',
+                                text: '¡Felicitaciones! Materia agregada correctamente.',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            });
+                            if(toastCBCBottom.opened){
+                                toastCBCBottom.on('close', function () {
+                                    toastConfirmacionMateriaAgregada.open();
+                                  });
+                            }else{
+                                toastConfirmacionMateriaAgregada.open(); 
+                            }
+                            $$('#agregarMateriaAprobada').removeClass('disabled');
+                            $$('#agregarMateriaAprobada').text('Agregar materia');
+
+                            //Medallas
+                            if (nota == 10) {
+                                verificarMedalla("medallaDiego", 0);
+                            }
+                            //Verifico si es la primer materia aprobada (Para asignar medalla)
+                            if (parseInt(carreraOriginal.cantidadMateriasAprobadas) == 0) {
+                                verificarMedalla("medallaPrimerPaso", 1);
+                            }
+
+                            //Verifico el porcentaje
+                            if (carreraAModificar.progreso >= 25 && carreraAModificar.progreso < 35) {
+                                verificarMedalla("medallaPrimerCuarto", 2);
+                            } else if (carreraAModificar.progreso >= 50 && carreraAModificar.progreso < 65) {
+                                verificarMedalla("medallaMitad", 3);
+                            } else if (carreraAModificar.progreso >= 75 && carreraAModificar.progreso < 85) {
+                                verificarMedalla("medalla75", 4);
+                            }
+
+                            //Si se recibió
+                            if (seRecibio) {
+                                confetti.start();
+                                setTimeout(function () { confetti.stop(); }, 10000);
+                                verificarMedalla("medallaGraduado", 5);
+                            }
+
+                            mainView.router.navigate('/home/');
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-
-
-
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -808,71 +879,148 @@ function agregarMateriaAListaDeMateriasConCreditos() {
             carreraAModificar.creditosObtenidos += creditos;
 
             if (nota != -1) {
-                var promedioNuevo=calcularPromedio(carreraAModificar,nota,'+',0)
-                carreraAModificar.promedio = promedioNuevo;
-            }
+                /*
+                var promedioNuevo = calcularPromedio(carreraAModificar, nota, '+', 0, idMateria)
+                carreraAModificar.promedio = promedioNuevo;*/
+                //FdsWho4vrO5SkgONNnAy es un idMateria con anio=0
+                calcularPromedio(carreraAModificar, nota, '+', 0, "FdsWho4vrO5SkgONNnAy").
+                    then(nuevoPromedio => {
+                        console.log("El promedio devuelto es: " + nuevoPromedio);
+                        carreraAModificar.promedio = nuevoPromedio;
 
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+                        var seRecibio = false;
+                        if (carreraAModificar.cantidadMateriasPendientes == 0) {
+                            if (carreraAModificar.creditosObtenidos >= carreraAModificar.creditosNecesarios) {
+                                carreraAModificar.progreso = 100;
+                                seRecibio = true;
+                            }
+                        }
+
+                        //Borro la materia del array
+                        referenciaUsuario.update({
+                            "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                        })
 
 
-                .then(function () {
+                            .then(function () {
 
-                    console.log("Carrera eliminada correctamente.");
-                    //mainView.router.navigate('/home/');
+                                console.log("Carrera eliminada correctamente.");
+                                //mainView.router.navigate('/home/');
 
+                            })
+                            .catch(function (error) {
+
+                                console.log("Error: " + error);
+
+                            });
+
+                        referenciaUsuario.update({
+                            "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                        })
+
+
+                            .then(function () {
+
+                                console.log("Carrera agregada correctamente.");
+                                var toastConfirmacionMateriaAgregada = app.toast.create({
+                                    icon: '<i class="f7-icons">checkmark_alt</i>',
+                                    text: '¡Felicitaciones! Materia agregada correctamente.',
+                                    position: 'center',
+                                    closeTimeout: 2000,
+                                });
+                                toastConfirmacionMateriaAgregada.open();
+                                $$('#agregarMateriaConCreditos').removeClass('disabled');
+                                $$('#agregarMateriaConCreditos').text('Agregar materia');
+
+                                //Medallas
+                                if (nota == 10) {
+                                    verificarMedalla("medallaDiego", 0);
+                                }
+
+                                //Si se recicibió
+                                if (seRecibio) {
+                                    confetti.start();
+                                    setTimeout(function () { confetti.stop(); }, 10000);
+                                    verificarMedalla("medallaGraduado", 5);
+                                }
+
+
+                                mainView.router.navigate('/home/');
+
+                            })
+                            .catch(function (error) {
+
+                                console.log("Error: " + error);
+
+                            });
+                    })
+            } else {
+                var seRecibio = false;
+                if (carreraAModificar.cantidadMateriasPendientes == 0) {
+                    if (carreraAModificar.creditosObtenidos >= carreraAModificar.creditosNecesarios) {
+                        carreraAModificar.progreso = 100;
+                        seRecibio = true;
+                    }
+                }
+
+                //Borro la materia del array
+                referenciaUsuario.update({
+                    "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
 
 
-                .then(function () {
+                    .then(function () {
 
-                    console.log("Carrera agregada correctamente.");
-                    var toastConfirmacionMateriaAgregada = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: '¡Felicitaciones! Materia agregada correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
+                        console.log("Carrera eliminada correctamente.");
+                        //mainView.router.navigate('/home/');
+
+                    })
+                    .catch(function (error) {
+
+                        console.log("Error: " + error);
+
                     });
-                    toastConfirmacionMateriaAgregada.open();
-                    $$('#agregarMateriaConCreditos').removeClass('disabled');
-                    $$('#agregarMateriaConCreditos').text('Agregar materia');
 
-                    //Medallas
-                    if (nota == 10) {
-                        verificarMedalla("medallaDiego", 0);
-                    }
-
-
-                    //Si se recicibió //REVISAR
-                    if (carreraAModificar.cantidadMateriasPendientes == 0) {
-                        confetti.start();
-                        setTimeout(function () { confetti.stop(); }, 10000);
-                        verificarMedalla("medallaGraduado", 5);
-                    }
-
-                    mainView.router.navigate('/home/');
-
+                referenciaUsuario.update({
+                    "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
 
 
+                    .then(function () {
+
+                        console.log("Carrera agregada correctamente.");
+                        var toastConfirmacionMateriaAgregada = app.toast.create({
+                            icon: '<i class="f7-icons">checkmark_alt</i>',
+                            text: '¡Felicitaciones! Materia agregada correctamente.',
+                            position: 'center',
+                            closeTimeout: 2000,
+                        });
+                        toastConfirmacionMateriaAgregada.open();
+                        $$('#agregarMateriaConCreditos').removeClass('disabled');
+                        $$('#agregarMateriaConCreditos').text('Agregar materia');
+
+                        //Medallas
+                        if (nota == 10) {
+                            verificarMedalla("medallaDiego", 0);
+                        }
+
+                        //Si se recicibió
+                        if (seRecibio) {
+                            confetti.start();
+                            setTimeout(function () { confetti.stop(); }, 10000);
+                            verificarMedalla("medallaGraduado", 5);
+                        }
 
 
+                        mainView.router.navigate('/home/');
+
+                    })
+                    .catch(function (error) {
+
+                        console.log("Error: " + error);
+
+                    });
+            }
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -908,7 +1056,8 @@ function agregarFinalDesaprobado() {
             var materiaDesaprobada = {
                 id: Date.now(),
                 nombreMateria: nombreMateria,
-                nota: nota
+                nota: nota,
+                idMateria: idMateria
             };
 
             //Actualizo el array materiasDesaprobadas
@@ -921,54 +1070,66 @@ function agregarFinalDesaprobado() {
             }
             console.log(carreraAModificar);
 
-            var nuevoPromedio = calcularPromedio(carreraAModificar,nota,'+',0);
-            carreraAModificar.promedio=nuevoPromedio;
+            /*
+            var nuevoPromedio = calcularPromedio(carreraAModificar, nota, '+', 0, idMateria);
+            carreraAModificar.promedio = nuevoPromedio;
+            */
+            calcularPromedio(carreraAModificar, nota, '+', 0, idMateria).
+                then(nuevoPromedio => {
 
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+                    carreraAModificar.promedio = nuevoPromedio;
+
+                    //Borro la materia del array
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                    })
 
 
-                .then(function () {
+                        .then(function () {
 
-                    console.log("Carrera eliminada correctamente.");
+                            console.log("Carrera eliminada correctamente.");
 
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
+
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                    })
+
+
+                        .then(function () {
+
+                            console.log("Carrera agregada correctamente.");
+                            var toastConfirmacionFinalAgregado = app.toast.create({
+                                icon: '<i class="f7-icons">checkmark_alt</i>',
+                                text: '¡Listo! Final cargado correctamente.',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            });
+                            if(toastCBCBottom.opened){
+                                toastCBCBottom.on('close', function () {
+                                    toastConfirmacionFinalAgregado.open();
+                                  });
+                            }else{
+                                toastConfirmacionFinalAgregado.open(); 
+                            }
+                            $$('#agregarFinalDesAprobado').removeClass('disabled');
+                            $$('#agregarFinalDesAprobado').text('Agregar materia');
+
+
+                            mainView.router.navigate('/home/');
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
-
-
-                .then(function () {
-
-                    console.log("Carrera agregada correctamente.");
-                    var toastConfirmacionFinalAgregado = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: '¡Listo! Final cargado correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
-                    });
-                    toastConfirmacionFinalAgregado.open();
-                    $$('#agregarFinalDesAprobado').removeClass('disabled');
-                    $$('#agregarFinalDesAprobado').text('Agregar materia');
-
-
-                    mainView.router.navigate('/home/');
-
-                })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
 
 
 
@@ -1232,7 +1393,7 @@ function listarMaterias() {
                             if (nombreMateriaDesaprobada.slice(-1) == ".") {
                                 nombreMateriaDesaprobada = nombreMateriaDesaprobada.slice(0, -1);
                             }
-                            $$('#listaMateriasDesaprobadas').append('<li><a href="/materiaDesaprobada/' + doc.data().carreras[indice].materiasDesaprobadas[j].id + '/' + nombreMateriaDesaprobada + '/' + doc.data().carreras[indice].materiasDesaprobadas[j].nota + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasDesaprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasDesaprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
+                            $$('#listaMateriasDesaprobadas').append('<li><a href="/materiaDesaprobada/' + doc.data().carreras[indice].materiasDesaprobadas[j].id + '/' + doc.data().carreras[indice].materiasDesaprobadas[j].idMateria + '/' + nombreMateriaDesaprobada + '/' + doc.data().carreras[indice].materiasDesaprobadas[j].nota + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasDesaprobadas[j].nombreMateria + '<div class="item-footer">Nota: ' + doc.data().carreras[indice].materiasDesaprobadas[j].nota + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
                         }
                     } else {
                         //No listo nada
@@ -1367,68 +1528,73 @@ function actualizarMateriaAprobada() {
 
             var notaAnterior = carreraAModificar.materiasAprobadas[indiceMateria].nota;
             console.log("nota anterior: " + notaAnterior);
+            /*
+            var nuevoPromedio = calcularPromedio(carreraAModificar, nota, '=', notaAnterior, idMateria);
+            carreraAModificar.promedio = nuevoPromedio;*/
 
-            var nuevoPromedio=calcularPromedio(carreraAModificar,nota,'=',notaAnterior);
-            carreraAModificar.promedio=nuevoPromedio;
-            
+            calcularPromedio(carreraAModificar, nota, '=', notaAnterior, idMateria).
+                then(nuevoPromedio => {
+                    carreraAModificar.promedio = nuevoPromedio;
+                    //Modifico la materia elegida del array materiasAprobadas
+                    carreraAModificar.materiasAprobadas[indiceMateria].fechaAprobacion = fechaAprobacionTimeStamp;
+                    carreraAModificar.materiasAprobadas[indiceMateria].nota = nota;
 
-            //Modifico la materia elegida del array materiasAprobadas
-            carreraAModificar.materiasAprobadas[indiceMateria].fechaAprobacion = fechaAprobacionTimeStamp;
-            carreraAModificar.materiasAprobadas[indiceMateria].nota = nota;
-
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+                    //Borro la materia del array
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                    })
 
 
-                .then(function () {
+                        .then(function () {
 
-                    console.log("Carrera eliminada correctamente.");
+                            console.log("Carrera eliminada correctamente.");
 
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
+
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                    })
+
+
+                        .then(function () {
+
+                            console.log("Carrera agregada correctamente.");
+                            var toastConfirmacionMateriaActualizada = app.toast.create({
+                                icon: '<i class="f7-icons">checkmark_alt</i>',
+                                text: 'Materia actualizada correctamente.',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            });
+                            if(toastCBCBottom.opened){
+                                toastCBCBottom.on('close', function () {
+                                    toastConfirmacionMateriaActualizada.open();
+                                  });
+                            }else{
+                                toastConfirmacionMateriaActualizada.open(); 
+                            }
+                            $$('#actualizarMateriaAprobada').removeClass('disabled');
+                            $$('#actualizarMateriaAprobada').text('Actualizar materia');
+                            mainView.router.navigate('/home/');
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
-
-
-                .then(function () {
-
-                    console.log("Carrera agregada correctamente.");
-                    var toastConfirmacionMateriaActualizada = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: 'Materia actualizada correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
-                    });
-                    toastConfirmacionMateriaActualizada.open();
-                    $$('#actualizarMateriaAprobada').removeClass('disabled');
-                    $$('#actualizarMateriaAprobada').text('Actualizar materia');
-                    mainView.router.navigate('/home/');
-
-                })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-
-
-
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
         });
 }
 
-function actualizarMateriaConCreditos(){
+function actualizarMateriaConCreditos() {
     $$('#actualizarMateriaConCreditos').addClass('disabled');
     $$('#actualizarMateriaConCreditos').text('Actualizando materia');
     var idMateria = $$('#materiaConCreditosIdMateria').val();
@@ -1438,7 +1604,7 @@ function actualizarMateriaConCreditos(){
     var fechaAprobacionTimeStamp = firebase.firestore.Timestamp.fromDate(new Date(fechaAprobacion));
     var creditos = parseInt($$('#materiaConCreditosCreditos').val());
 
-    console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota+" Creditos: "+creditos);
+    console.log("idMateria: " + idMateria + " Nombre: " + nombreMateria + " Fecha: " + fechaAprobacion + " nota: " + nota + " Creditos: " + creditos);
 
     baseDeDatos = firebase.firestore();
     var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
@@ -1463,66 +1629,100 @@ function actualizarMateriaConCreditos(){
             console.log("Indice de materia: " + indiceMateria);
 
             var notaAnterior = carreraAModificar.materiasConCreditos[indiceMateria].nota;
-            var creditosAnteriores= carreraAModificar.materiasConCreditos[indiceMateria].creditos;
-            console.log("Nota anterior: " + notaAnterior+" Creditos anteriores: "+creditosAnteriores);
+            var creditosAnteriores = carreraAModificar.materiasConCreditos[indiceMateria].creditos;
+            console.log("Nota anterior: " + notaAnterior + " Creditos anteriores: " + creditosAnteriores);
 
-            var nuevoPromedio=calcularPromedio(carreraAModificar,nota,'=',notaAnterior);
-            carreraAModificar.promedio=nuevoPromedio;
+            /*var nuevoPromedio = calcularPromedio(carreraAModificar, nota, '=', notaAnterior, idMateria);
+            carreraAModificar.promedio = nuevoPromedio;*/
 
-            //Actualizo los créditos obtenidos
-            carreraAModificar.creditosObtenidos-=creditosAnteriores;
-            carreraAModificar.creditosObtenidos+=creditos;
+            calcularPromedio(carreraAModificar, nota, '=', notaAnterior, "FdsWho4vrO5SkgONNnAy").
+                then(nuevoPromedio => {
+                    carreraAModificar.promedio = nuevoPromedio;
+                    //Actualizo los créditos obtenidos
+                    carreraAModificar.creditosObtenidos -= creditosAnteriores;
+                    carreraAModificar.creditosObtenidos += creditos;
 
-            //Modifico la materia elegida del array materiasConCreditos
-            carreraAModificar.materiasConCreditos[indiceMateria].fechaAprobacion = fechaAprobacionTimeStamp;
-            carreraAModificar.materiasConCreditos[indiceMateria].nota = nota;
-            carreraAModificar.materiasConCreditos[indiceMateria].creditos = creditos;
+                    //Modifico la materia elegida del array materiasConCreditos
+                    carreraAModificar.materiasConCreditos[indiceMateria].fechaAprobacion = fechaAprobacionTimeStamp;
+                    carreraAModificar.materiasConCreditos[indiceMateria].nota = nota;
+                    carreraAModificar.materiasConCreditos[indiceMateria].creditos = creditos;
 
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+                    var seRecibio = false;
+                    if (carreraAModificar.cantidadMateriasPendientes == 0) {
+                        if (carreraAModificar.creditosObtenidos >= carreraAModificar.creditosNecesarios) {
+                            carreraAModificar.progreso = 100;
+                            seRecibio = true;
+                        } else {
+                            //Recalculo progreso
+                            var totalMaterias;
+                            var totalMateriasRegulares = 0;
+                            if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
+                                totalMateriasRegulares = carreraAModificar.materiasRegulares.length;
+                            }
+                            totalMaterias = carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes + totalMateriasRegulares;
+
+                            var nuevoPorcentajeProgreso = recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas, totalMaterias, true);
+
+                            carreraAModificar.progreso = nuevoPorcentajeProgreso;
+                        }
+                    }
+
+                    //Borro la materia del array
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                    })
 
 
-                .then(function () {
+                        .then(function () {
 
-                    console.log("Carrera eliminada correctamente.");
+                            console.log("Carrera eliminada correctamente.");
 
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
+
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                    })
+
+
+                        .then(function () {
+
+                            console.log("Carrera agregada correctamente.");
+                            var toastConfirmacionMateriaActualizada = app.toast.create({
+                                icon: '<i class="f7-icons">checkmark_alt</i>',
+                                text: 'Materia actualizada correctamente.',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            });
+                            if(toastCBCBottom.opened){
+                                toastCBCBottom.on('close', function () {
+                                    toastConfirmacionMateriaActualizada.open();
+                                  });
+                            }else{
+                                toastConfirmacionMateriaActualizada.open(); 
+                            }
+                            $$('#actualizarMateriaConCreditos').removeClass('disabled');
+                            $$('#actualizarMateriaConCreditos').text('Actualizar materia');
+                            mainView.router.navigate('/home/');
+
+                            //Si se recibió
+                            if (seRecibio) {
+                                confetti.start();
+                                setTimeout(function () { confetti.stop(); }, 10000);
+                                verificarMedalla("medallaGraduado", 5);
+                            }
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
-
-
-                .then(function () {
-
-                    console.log("Carrera agregada correctamente.");
-                    var toastConfirmacionMateriaActualizada = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: 'Materia actualizada correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
-                    });
-                    toastConfirmacionMateriaActualizada.open();
-                    $$('#actualizarMateriaConCreditos').removeClass('disabled');
-                    $$('#actualizarMateriaConCreditos').text('Actualizar materia');
-                    mainView.router.navigate('/home/');
-
-                })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-
-
 
         })
         .catch(function (error) {
@@ -1535,6 +1735,7 @@ function actualizarMateriaDesaprobada() {
     $$('#actualizarMateriaDesaprobada').addClass('disabled');
     $$('#actualizarMateriaDesaprobada').text('Actualizando nota');
     var idMateria = $$('#materiaDesaprobadaIdMateria').val();
+    var idMateriaGlobal = $$('#materiaDesaprobadaIdMateriaGlobal').val();
     var nota = $$('#materiaDesaprobadaNota').val();
     var nombreMateria = $$('#materiaDesaprobadaNombreMateria').text();
 
@@ -1568,55 +1769,65 @@ function actualizarMateriaDesaprobada() {
             //Modifico la materia elegida del array materiasDesaprobadas
             carreraAModificar.materiasDesaprobadas[indiceMateria].nota = nota;
 
-            var nuevoPromedio=calcularPromedio(carreraAModificar,nota,'=',notaAnterior);
-            carreraAModificar.promedio=nuevoPromedio;
+            /*var nuevoPromedio = calcularPromedio(carreraAModificar, nota, '=', notaAnterior, idMateria);
+            carreraAModificar.promedio = nuevoPromedio;*/
 
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+            calcularPromedio(carreraAModificar, nota, '=', notaAnterior, idMateriaGlobal).
+                then(nuevoPromedio => {
+                    carreraAModificar.promedio = nuevoPromedio;
+                    
+                    //Borro la materia del array
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                    })
 
 
-                .then(function () {
+                        .then(function () {
 
-                    console.log("Carrera eliminada correctamente.");
+                            console.log("Carrera eliminada correctamente.");
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
+
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                    })
+
+
+                        .then(function () {
+
+                            console.log("Carrera agregada correctamente.");
+                            var toastConfirmacionMateriaDesaprobadaActualizada = app.toast.create({
+                                icon: '<i class="f7-icons">checkmark_alt</i>',
+                                text: 'Final actualizado correctamente.',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            });
+                            if(toastCBCBottom.opened){
+                                toastCBCBottom.on('close', function () {
+                                    toastConfirmacionMateriaDesaprobadaActualizada.open();
+                                  });
+                            }else{
+                                toastConfirmacionMateriaDesaprobadaActualizada.open(); 
+                            }
+                            
+                            
+                            $$('#actualizarMateriaDesaprobada').removeClass('disabled');
+                            $$('#actualizarMateriaDesaprobada').text('Actualizar nota');
+                            mainView.router.navigate('/home/');
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
 
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
-
-
-                .then(function () {
-
-                    console.log("Carrera agregada correctamente.");
-                    var toastConfirmacionMateriaDesaprobadaActualizada = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: 'Final actualizado correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
-                    });
-                    toastConfirmacionMateriaDesaprobadaActualizada.open();
-                    $$('#actualizarMateriaDesaprobada').removeClass('disabled');
-                    $$('#actualizarMateriaDesaprobada').text('Actualizar nota');
-                    mainView.router.navigate('/home/');
-
-                })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-
-
-
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -1677,67 +1888,79 @@ function moverMateriaDeAprobadasAPendientes() {
             carreraAModificar.cantidadMateriasAprobadas--;
             carreraAModificar.cantidadMateriasPendientes++;
 
-            var nuevoPromedio=calcularPromedio(carreraAModificar,0,'-',notaEliminada);
-            carreraAModificar.promedio=nuevoPromedio;
+            /*var nuevoPromedio = calcularPromedio(carreraAModificar, 0, '-', notaEliminada, idMateria);
+            carreraAModificar.promedio = nuevoPromedio;*/
 
-            //Recalculo progreso
-            var totalMaterias;
-            var totalMateriasRegulares = 0;
-            if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
-                totalMateriasRegulares = carreraAModificar.materiasRegulares.length;
-            }
-            totalMaterias = carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes + totalMateriasRegulares;
+            calcularPromedio(carreraAModificar, 0, '-', notaEliminada, idMateria).
+                then(nuevoPromedio => {
+                    carreraAModificar.promedio = nuevoPromedio;
+                    //Recalculo progreso
+                    var totalMaterias;
+                    var totalMateriasRegulares = 0;
+                    if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
+                        totalMateriasRegulares = carreraAModificar.materiasRegulares.length;
+                    }
+                    totalMaterias = carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes + totalMateriasRegulares;
 
-            var nuevoPorcentajeProgreso = recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas, totalMaterias);
+                    var carreraConCreditos = false;
+                    if (typeof carreraAModificar.creditosNecesarios !== 'undefined') {
+                        carreraConCreditos = true;
+                    }
 
-            carreraAModificar.progreso = nuevoPorcentajeProgreso;
+                    var nuevoPorcentajeProgreso = recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas, totalMaterias, carreraConCreditos);
 
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+                    carreraAModificar.progreso = nuevoPorcentajeProgreso;
+
+                    //Borro la materia del array
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                    })
 
 
-                .then(function () {
+                        .then(function () {
 
-                    console.log("Carrera eliminada correctamente.");
+                            console.log("Carrera eliminada correctamente.");
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
+
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                    })
+
+
+                        .then(function () {
+
+                            console.log("Carrera quitada correctamente.");
+                            var toastConfirmacionMateriaRemovida = app.toast.create({
+                                icon: '<i class="f7-icons">checkmark_alt</i>',
+                                text: 'Materia quitada correctamente.',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            });
+                            if(toastCBCBottom.opened){
+                                toastCBCBottom.on('close', function () {
+                                    toastConfirmacionMateriaRemovida.open();
+                                  });
+                            }else{
+                                toastConfirmacionMateriaRemovida.open(); 
+                            }
+                            $$('#quitarMateriaAprobada').removeClass('disabled');
+                            $$('#quitarMateriaAprobada').text('Quitar materia');
+                            mainView.router.navigate('/home/');
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
 
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
-
-
-                .then(function () {
-
-                    console.log("Carrera quitada correctamente.");
-                    var toastConfirmacionMateriaRemovida = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: 'Materia quitada correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
-                    });
-                    toastConfirmacionMateriaRemovida.open();
-                    $$('#quitarMateriaAprobada').removeClass('disabled');
-                    $$('#quitarMateriaAprobada').text('Quitar materia');
-                    mainView.router.navigate('/home/');
-
-                })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-
-
-
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -1746,11 +1969,11 @@ function moverMateriaDeAprobadasAPendientes() {
 
 };
 
-function eliminarMateriaConCreditos(){
+function eliminarMateriaConCreditos() {
     $$('#quitarMateriaConCreditos').addClass('disabled');
     $$('#quitarMateriaConCreditos').text('Quitando materia');
     var idMateria = $$('#materiaConCreditosIdMateria').val();
-    var creditos= parseInt($$('#materiaConCreditosCreditos').val());
+    var creditos = parseInt($$('#materiaConCreditosCreditos').val());
 
     baseDeDatos = firebase.firestore();
     var referenciaUsuario = baseDeDatos.collection('Usuarios').doc(usuario);
@@ -1781,60 +2004,137 @@ function eliminarMateriaConCreditos(){
             carreraAModificar.materiasConCreditos.splice(indiceMateria, 1);
 
             //Actualizo los creditosObtenidos 
-            carreraAModificar.creditosObtenidos-=creditos;
-            
+            carreraAModificar.creditosObtenidos -= creditos;
+
             //Si la nota es numérica, actualizo promedio
-            if(notaEliminada!=-1){
-                var nuevoPromedio=calcularPromedio(carreraAModificar,0,'-',notaEliminada);
-                carreraAModificar.promedio=nuevoPromedio;
-            }
+            if (notaEliminada != -1) {
+                /*var nuevoPromedio = calcularPromedio(carreraAModificar, 0, '-', notaEliminada, idMateria);
+                carreraAModificar.promedio = nuevoPromedio;*/
+                calcularPromedio(carreraAModificar, 0, '-', notaEliminada, "FdsWho4vrO5SkgONNnAy").
+                    then(nuevoPromedio => {
+                        carreraAModificar.promedio = nuevoPromedio;
+                        //Si al quitar créditos son menores que los necesarios, vuelvo a recalcular el progreso
+                        if (carreraAModificar.creditosObtenidos < carreraAModificar.creditosNecesarios) {
 
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+                            //Recalculo progreso
+                            var totalMaterias;
+                            var totalMateriasRegulares = 0;
+                            if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
+                                totalMateriasRegulares = carreraAModificar.materiasRegulares.length;
+                            }
+                            totalMaterias = carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes + totalMateriasRegulares;
+
+                            var nuevoPorcentajeProgreso = recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas, totalMaterias, true);
+
+                            carreraAModificar.progreso = nuevoPorcentajeProgreso;
+                        }
 
 
-                .then(function () {
+                        //Borro la materia del array
+                        referenciaUsuario.update({
+                            "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                        })
 
-                    console.log("Carrera eliminada correctamente.");
 
+                            .then(function () {
+
+                                console.log("Carrera eliminada correctamente.");
+
+                            })
+                            .catch(function (error) {
+
+                                console.log("Error: " + error);
+
+                            });
+
+                        referenciaUsuario.update({
+                            "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                        })
+
+
+                            .then(function () {
+
+                                console.log("Carrera quitada correctamente.");
+                                var toastConfirmacionMateriaRemovida = app.toast.create({
+                                    icon: '<i class="f7-icons">checkmark_alt</i>',
+                                    text: 'Materia quitada correctamente.',
+                                    position: 'center',
+                                    closeTimeout: 2000,
+                                });
+                                toastConfirmacionMateriaRemovida.open();
+                                $$('#quitarMateriaConCreditos').removeClass('disabled');
+                                $$('#quitarMateriaConCreditos').text('Quitar materia');
+                                mainView.router.navigate('/home/');
+
+                            })
+                            .catch(function (error) {
+
+                                console.log("Error: " + error);
+
+                            });
+                    })
+
+            } else {
+                //Si al quitar créditos son menores que los necesarios, vuelvo a recalcular el progreso
+                if (carreraAModificar.creditosObtenidos < carreraAModificar.creditosNecesarios) {
+
+                    //Recalculo progreso
+                    var totalMaterias;
+                    var totalMateriasRegulares = 0;
+                    if (typeof carreraAModificar.materiasRegulares !== 'undefined') {
+                        totalMateriasRegulares = carreraAModificar.materiasRegulares.length;
+                    }
+                    totalMaterias = carreraAModificar.cantidadMateriasAprobadas + carreraAModificar.cantidadMateriasPendientes + totalMateriasRegulares;
+
+                    var nuevoPorcentajeProgreso = recalcularProgreso(carreraAModificar.cantidadMateriasAprobadas, totalMaterias, true);
+
+                    carreraAModificar.progreso = nuevoPorcentajeProgreso;
+                }
+
+
+                //Borro la materia del array
+                referenciaUsuario.update({
+                    "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
 
 
-                .then(function () {
+                    .then(function () {
 
-                    console.log("Carrera quitada correctamente.");
-                    var toastConfirmacionMateriaRemovida = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: 'Materia quitada correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
+                        console.log("Carrera eliminada correctamente.");
+
+                    })
+                    .catch(function (error) {
+
+                        console.log("Error: " + error);
+
                     });
-                    toastConfirmacionMateriaRemovida.open();
-                    $$('#quitarMateriaConCreditos').removeClass('disabled');
-                    $$('#quitarMateriaConCreditos').text('Quitar materia');
-                    mainView.router.navigate('/home/');
 
+                referenciaUsuario.update({
+                    "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
 
 
+                    .then(function () {
 
+                        console.log("Carrera quitada correctamente.");
+                        var toastConfirmacionMateriaRemovida = app.toast.create({
+                            icon: '<i class="f7-icons">checkmark_alt</i>',
+                            text: 'Materia quitada correctamente.',
+                            position: 'center',
+                            closeTimeout: 2000,
+                        });
+                        toastConfirmacionMateriaRemovida.open();
+                        $$('#quitarMateriaConCreditos').removeClass('disabled');
+                        $$('#quitarMateriaConCreditos').text('Quitar materia');
+                        mainView.router.navigate('/home/');
 
+                    })
+                    .catch(function (error) {
+
+                        console.log("Error: " + error);
+
+                    });
+            }
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -1948,6 +2248,7 @@ function quitarMateriaDesaprobada() {
     $$('#quitarMateriaDesaprobada').addClass('disabled');
     $$('#quitarMateriaDesaprobada').text('Quitando final desaprobado');
     var idMateria = $$('#materiaDesaprobadaIdMateria').val();
+    var idMateriaGlobal = $$('#materiaDesaprobadaIdMateriaGlobal').val();
     var nota = $$('#materiaDesaprobadaNota').val();
     var nombreMateria = $$('#materiaDesaprobadaNombreMateria').text();
 
@@ -1980,52 +2281,61 @@ function quitarMateriaDesaprobada() {
 
             console.log("Cant materias desaprobadas: " + cantidadMateriasDesaprobadas);
 
-            var nuevoPromedio = calcularPromedio(carreraAModificar,0,'-',nota);
-            carreraAModificar.promedio=nuevoPromedio;
+            /*var nuevoPromedio = calcularPromedio(carreraAModificar, 0, '-', nota, idMateria);
+            carreraAModificar.promedio = nuevoPromedio;*/
 
-            //Borro la materia del array
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
-            })
+            calcularPromedio(carreraAModificar, 0, '-', nota, idMateriaGlobal).
+                then(nuevoPromedio => {
+                    carreraAModificar.promedio = nuevoPromedio;
+                    //Borro la materia del array
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayRemove(carreraOriginal)
+                    })
 
 
-                .then(function () {
+                        .then(function () {
 
-                    console.log("Carrera eliminada correctamente.");
+                            console.log("Carrera eliminada correctamente.");
 
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
+
+                    referenciaUsuario.update({
+                        "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
+                    })
+
+
+                        .then(function () {
+
+                            console.log("Final eliminado correctamente.");
+                            var toastConfirmacionMateriaDesaprobadaEliminada = app.toast.create({
+                                icon: '<i class="f7-icons">checkmark_alt</i>',
+                                text: 'Final eliminado correctamente.',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            });
+                            if(toastCBCBottom.opened){
+                                toastCBCBottom.on('close', function () {
+                                    toastConfirmacionMateriaDesaprobadaEliminada.open();
+                                  });
+                            }else{
+                                toastConfirmacionMateriaDesaprobadaEliminada.open(); 
+                            }
+                            $$('#quitarMateriaDesaprobada').removeClass('disabled');
+                            $$('#quitarMateriaDesaprobada').text('Quitar final desaprobado');
+                            mainView.router.navigate('/home/');
+
+                        })
+                        .catch(function (error) {
+
+                            console.log("Error: " + error);
+
+                        });
                 })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
-            referenciaUsuario.update({
-                "carreras": firebase.firestore.FieldValue.arrayUnion(carreraAModificar)
-            })
-
-
-                .then(function () {
-
-                    console.log("Final eliminado correctamente.");
-                    var toastConfirmacionMateriaDesaprobadaEliminada = app.toast.create({
-                        icon: '<i class="f7-icons">checkmark_alt</i>',
-                        text: 'Final actualizado correctamente.',
-                        position: 'center',
-                        closeTimeout: 2000,
-                    });
-                    toastConfirmacionMateriaDesaprobadaEliminada.open();
-                    $$('#quitarMateriaDesaprobada').removeClass('disabled');
-                    $$('#quitarMateriaDesaprobada').text('Quitar final desaprobado');
-                    mainView.router.navigate('/home/');
-
-                })
-                .catch(function (error) {
-
-                    console.log("Error: " + error);
-
-                });
-
         })
         .catch(function (error) {
             console.log("Error getting documents: ", error);
@@ -2035,67 +2345,132 @@ function quitarMateriaDesaprobada() {
 }
 
 //Calculo progreso
-function recalcularProgreso(materiasAprobadas, totalMaterias) {
-    var nuevoPorcentajeProgreso = (materiasAprobadas / (totalMaterias)) * 100;
+function recalcularProgreso(materiasAprobadas, totalMaterias, carreraConCreditos) {
+    var nuevoPorcentajeProgreso;
+    if (carreraConCreditos) {
+        nuevoPorcentajeProgreso = (materiasAprobadas / (totalMaterias + 1)) * 100;
+    } else {
+        nuevoPorcentajeProgreso = (materiasAprobadas / (totalMaterias)) * 100;
+    }
     nuevoPorcentajeProgreso = Math.round(nuevoPorcentajeProgreso * 10) / 10;
     return nuevoPorcentajeProgreso;
+
+
 }
 
 //Calculo promedio
-function calcularPromedio(carreraAModificar, notaNueva,operacion,notaAnterior) {
-    //Actualizo el promedio
-    var cantidadMateriasDesaprobadas;
-    if (typeof carreraAModificar.materiasDesaprobadas !== 'undefined') {
-        cantidadMateriasDesaprobadas = carreraAModificar.materiasDesaprobadas.length;
-    } else {
-        cantidadMateriasDesaprobadas = 0;
-    }
-    var cantidadMateriasConCreditos = 0;
-    if (typeof carreraAModificar.materiasConCreditos !== 'undefined') {
-        //Incluyo las materias con créditos
-        if (carreraAModificar.materiasConCreditos.length > 0) {
-            for (var j = 0; j < carreraAModificar.materiasConCreditos.length; j++) {
-                if (carreraAModificar.materiasConCreditos[j].nota != -1) {
-                    cantidadMateriasConCreditos++;
+function calcularPromedio(carreraAModificar, notaNueva, operacion, notaAnterior, idMateria) {
+    baseDeDatos = firebase.firestore();
+    var refMateria = baseDeDatos.collection("Materias").doc(idMateria);
+    return refMateria.get()
+        .then(function (doc) {
+            if (doc.data().anio == -100) {
+                console.log(doc.data().nombre + " pertenece al CBC");
+                
+                toastCBCBottom.open();
+                return carreraAModificar.promedio;
+            } else {
+                console.log("NO pertenece al CBC -> Calculo promedio");
+                //Actualizo el promedio
+
+                //Ver cantidad de materias con creditos
+                var cantidadMateriasConCreditos = 0;
+                if (typeof carreraAModificar.materiasConCreditos !== 'undefined') {
+                    //Incluyo las materias con créditos
+                    if (carreraAModificar.materiasConCreditos.length > 0) {
+                        for (var j = 0; j < carreraAModificar.materiasConCreditos.length; j++) {
+                            if (carreraAModificar.materiasConCreditos[j].nota != -1) {
+                                cantidadMateriasConCreditos++;
+                            }
+
+                        }
+                    }
+                }
+                //Ver cantidad de materias aprobadas (Sin contar las del CBC)
+                var cantidadMateriasAprobadas = 0;
+                var promesas = [];
+                for (var k = 0; k < carreraAModificar.materiasAprobadas.length; k++) {
+
+                    var refMateriaAprobada = baseDeDatos.collection("Materias").doc(carreraAModificar.materiasAprobadas[k].idMateria);
+                    promesas[k] = refMateriaAprobada.get()
+                        .then(function (doc2) {
+                            if (doc2.data().anio != -100) {
+                                cantidadMateriasAprobadas++;
+                                console.log("La materia " + doc2.data().nombre + " no pertenece al CBC.");
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log("Error getting documents: ", error);
+                        });
                 }
 
+                //Ver cantidad de materias desaprobadas
+                var cantidadMateriasDesaprobadas = 0;
+                if (typeof carreraAModificar.materiasDesaprobadas !== 'undefined') {
+                    //cantidadMateriasDesaprobadas = carreraAModificar.materiasDesaprobadas.length;
+                    for (var i = 0; i < carreraAModificar.materiasDesaprobadas.length; i++) {
+
+                        var refMateriaDesaprobada = baseDeDatos.collection("Materias").doc(carreraAModificar.materiasDesaprobadas[i].idMateria);
+                        promesas[k + i] = refMateriaDesaprobada.get()
+                            .then(function (doc3) {
+                                if (doc3.data().anio != -100) {
+                                    cantidadMateriasDesaprobadas++;
+                                    console.log("La materia desaprobada " + doc3.data().nombre + " no pertenece al CBC.");
+                                }
+                            })
+                            .catch(function (error) {
+                                console.log("Error getting documents: ", error);
+                            });
+                    }
+                }
+
+                return Promise.all(promesas)
+                    .then(values => {
+                        //Obtengo valores para recalcular el promedio
+                        console.log("Cantidad materias con créditos: " + cantidadMateriasConCreditos + " Cantidad de desaprobadas (no CBC): " + cantidadMateriasDesaprobadas + " Cantidad de aprobadas (no CBC): " + cantidadMateriasAprobadas);
+
+                        var totalMateriasParaPromedio = cantidadMateriasDesaprobadas + cantidadMateriasAprobadas + cantidadMateriasConCreditos;
+
+                        console.log("Total materias para realizar el promedio: " + totalMateriasParaPromedio);
+
+                        //+: Nueva nota. =:Cambio de nota. -:Eliminación de nota
+                        switch (operacion) {
+                            case '+':
+                                var sumatoriaNotasActual = carreraAModificar.promedio * (totalMateriasParaPromedio - 1);//Resto la materia que acabo de agregar
+                                console.log("Sumatoria calculada: " + sumatoriaNotasActual);
+                                var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) + parseFloat(notaNueva);
+                                console.log("Sumatoria nueva calculada: " + sumatoriaNotasNueva);
+                                //Recalculo promedio
+                                var nuevoPromedio = (sumatoriaNotasNueva) / (totalMateriasParaPromedio);
+                                return Math.round(nuevoPromedio * 100) / 100;
+                            case '=':
+                                var sumatoriaNotasActual = (carreraAModificar.promedio * totalMateriasParaPromedio) - notaAnterior;
+                                var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) + parseFloat(notaNueva);
+                                console.log("Sumatoria nueva calculada: " + sumatoriaNotasNueva);
+                                //Recalculo promedio
+                                var nuevoPromedio = (sumatoriaNotasNueva) / (totalMateriasParaPromedio);
+                                return carreraAModificar.promedio = Math.round(nuevoPromedio * 100) / 100;
+                            case '-':
+                                if (totalMateriasParaPromedio == 0) {
+                                    console.log("Promedio debe quedar en 0");
+                                    return 0;
+                                } else {
+                                    var sumatoriaNotasActual = carreraAModificar.promedio * (totalMateriasParaPromedio + 1);//Sumo la que acabo de quitar
+                                    var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) - parseFloat(notaAnterior);
+                                    var nuevoPromedio = (sumatoriaNotasNueva) / (totalMateriasParaPromedio);
+                                    return Math.round(nuevoPromedio * 100) / 100;
+                                }
+                            default:
+                                break;
+                        }
+                    });
+
+
             }
-        }
-    }
-    //Obtengo valores para recalcular el promedio
-    console.log("Cantidad materias con créditos: " + cantidadMateriasConCreditos+" Cantidad de desaprobadas: "+cantidadMateriasDesaprobadas+" Cantidad de aprobadas: "+carreraAModificar.cantidadMateriasAprobadas);
-    var totalMateriasParaPromedio = cantidadMateriasDesaprobadas + carreraAModificar.cantidadMateriasAprobadas + cantidadMateriasConCreditos;
-    //+: Nueva nota. =:Cambio de nota. -:Eliminación de nota
-    switch (operacion) {
-        case '+':
-            var sumatoriaNotasActual = carreraAModificar.promedio * (totalMateriasParaPromedio - 1);//Resto la materia que acabo de agregar
-            console.log("Sumatoria calculada: " + sumatoriaNotasActual);
-            var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) + parseFloat(notaNueva);
-            console.log("Sumatoria nueva calculada: " + sumatoriaNotasNueva);
-            //Recalculo promedio
-            var nuevoPromedio = (sumatoriaNotasNueva) / (totalMateriasParaPromedio);
-            return Math.round(nuevoPromedio * 10) / 10;
-        case '=':
-            var sumatoriaNotasActual = (carreraAModificar.promedio * totalMateriasParaPromedio) - notaAnterior;
-            var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) + parseFloat(notaNueva);
-            console.log("Sumatoria nueva calculada: " + sumatoriaNotasNueva);
-            //Recalculo promedio
-            var nuevoPromedio = (sumatoriaNotasNueva) / (totalMateriasParaPromedio);
-            return carreraAModificar.promedio = Math.round(nuevoPromedio * 10) / 10;
-        case '-':
-            if (totalMateriasParaPromedio == 0) {
-                console.log("Promedio debe quedar en 0");
-                return 0;
-            } else {
-                var sumatoriaNotasActual = carreraAModificar.promedio * (totalMateriasParaPromedio+1);//Sumo la que acabo de quitar
-                var sumatoriaNotasNueva = parseFloat(sumatoriaNotasActual) - parseFloat(notaAnterior);
-                var nuevoPromedio = (sumatoriaNotasNueva) / (totalMateriasParaPromedio);
-                return Math.round(nuevoPromedio * 10) / 10;
-            }
-        default:
-            break;
-    }
-    
+        })
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
 }
 
 //Detecto cambio en el <select> de Carreras en la Homepage

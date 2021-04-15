@@ -63,7 +63,7 @@ var app = new Framework7({
       url: 'materiaAprobada.html'
     },
     {
-      path: '/materiaDesaprobada/:idMateria/:nombreMateria/:nota/',
+      path: '/materiaDesaprobada/:idMateria/:idMateriaGlobal/:nombreMateria/:nota/',
       url: 'materiaDesaprobada.html'
     },
     {
@@ -318,8 +318,6 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
     }
   })
 
-
-
 })
 
 $$(document).on('page:reinit', '.page[data-name="home"]', function (e) {
@@ -332,15 +330,21 @@ $$(document).on('page:init', '.page[data-name="cargarMaterias"]', function (e) {
   cargarListaCorrelatividades(idCarrera);
   $$('#adminSubirMateria').on('click', function () {
     adminSubirMateria(idCarrera);
-  })
+  });
 })
 
 $$(document).on('page:init', '.page[data-name="listadoMaterias"]', function (e) {
   $$('.botonAtras').removeClass('oculto');
   $$('.menuIconContenedor').addClass('oculto');
   generarTabsListadoMaterias();
-  //listarMaterias();
-})
+  
+  var ayudaTooltip = app.tooltip.create({
+      targetEl: '#materiasConCreditosAyuda',
+      text: 'Algunas carreras cuentan con materias/cursos que otorgan créditos(o puntos) necesarios para conseguir el título.<br>Cómo las mismos varían constantemente, desde esta sección podés cargar vos las materias e indicar la cantidad de créditos sumados.',
+      trigger: 'click'
+    });
+  });
+
 
 $$(document).on('page:beforeout', '.page[data-name="listadoMaterias"]', function (e) {
   $$('.botonAtras').addClass('oculto');
@@ -367,7 +371,7 @@ $$(document).on('page:init', '.page[data-name="agregarMateria"]', function (e) {
     validarFinalDesAprobado();
   });
   $$('#agregarMateriaRegular').on('click', function () {
-    agregarMateriaRegularizada();
+    validarMateriaRegular();
   });
 })
 
@@ -470,18 +474,21 @@ $$(document).on('page:beforein', '.page[data-name="materiaDesaprobada"]', functi
   $$('.botonAtras').removeClass('oculto');
   $$('.menuIconContenedor').addClass('oculto');
   var idMateriaDesaprobadaRuta = '';
+  var idMateriaGlobalDesaprobadaRuta = '';
   var nombreMateriaDesaprobada = '';
   var notaMateriaDesaprobada = '';
 })
 
 $$(document).on('page:init', '.page[data-name="materiaDesaprobada"]', function (e) {
   idMateriaDesaprobadaRuta = app.view.main.router.currentRoute.params.idMateria;
+  idMateriaGlobalDesaprobadaRuta=app.view.main.router.currentRoute.params.idMateriaGlobal;
   nombreMateriaDesaprobada = app.view.main.router.currentRoute.params.nombreMateria;
   notaMateriaDesaprobada = app.view.main.router.currentRoute.params.nota;
 
   $$('#materiaDesaprobadaNombreMateria').text(nombreMateriaDesaprobada);
   $$('#materiaDesaprobadaNota').val(notaMateriaDesaprobada);
   $$('#materiaDesaprobadaIdMateria').val(idMateriaDesaprobadaRuta);
+  $$('#materiaDesaprobadaIdMateriaGlobal').val(idMateriaGlobalDesaprobadaRuta);
 
   $$('#actualizarMateriaDesaprobada').on('click', function () {
     validarActualizacionMateriaDesaprobada();
@@ -785,17 +792,7 @@ $$(document).on('page:init', '.page[data-name="adminCargarCarrera"]', function (
 });
 
 $$(document).on('page:init', '.page[data-name="adminHome"]', function (e) {
-  $$('#adminCargarMedallaColaborador').on('click', function () {
-    //verificarMedalla("medallaColaborador",6);
-    verificarMedallaUsuario("rjfleita@hotmail.com", "medallaColaborador", 6);
-  });
-
-  $$('#repararUsuario').on('click', function () {
-    //verificarMedalla("medallaColaborador",6);
-    var usuarioAReparar = $$("#usuarioAReparar").val();
-    repararUsuariosConMayuscula(usuarioAReparar);
-  });
-
+  
   $$('#borrarMateriaSeleccionada').on('click', function () {
     var materiaABorrar = $$("#materiaABorrar").val();
     borrarMateria(materiaABorrar);

@@ -34,6 +34,21 @@ function validarMateriaAprobada() {
 
 };
 
+function validarMateriaRegular(){
+    var idMateria = $$('#agregarRegularListaMaterias').val();
+    var huboError=false;
+    if (idMateria.length<1) {
+        $$('#agregarRegularSeleccionarMateriaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        huboError=true;
+    }else{
+        $$('#agregarRegularSeleccionarMateriaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+    }
+    if(!huboError){
+        agregarMateriaRegularizada();
+    }
+    
+}
+
 function validarFinalDesAprobado() {
     var idMateria = $$('#agregarFinalDesaprobadoListaMaterias').val();
     var nota = $$('#agregarFinalNota').val();
@@ -148,6 +163,7 @@ function validarActualizacionMateriaAprobada(){
 function validarActualizacionMateriaConCreditos(){
     var idMateria = $$('#materiaConCreditosIdMateria').val();
     var fechaAprobacion = $$('#materiaConCreditosFecha').val();
+    var tipoDeCalificacion = $$("#agregarMateriaConCreditosCalificacion").val();
     var nota = $$('#materiaConCreditosNota').val();
     var creditos = $$('#materiaConCreditosCreditos').val();
     var huboError=false;
@@ -162,13 +178,16 @@ function validarActualizacionMateriaConCreditos(){
     }else{
         $$('#agregarMateriaConCreditosSeleccionarFechaContenedor').removeClass('item-input-with-error-message item-input-invalid');
     }
-    
-    if(nota<4 || nota >10){
-        $$('#materiaConCreditosNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
-        huboError=true;
-    }else{
-        $$('#materiaConCreditosNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+
+    if(tipoDeCalificacion=="nota"){
+        if(nota<4 || nota >10){
+            $$('#agregarMateriaConCreditosNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
+            huboError=true;
+        }else{
+            $$('#agregarMateriaConCreditosNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+        }
     }
+    
     if(creditos<1 || creditos >100){
         $$('#materiaConCreditosCreditoContenedor').addClass('item-input-with-error-message item-input-invalid');
         huboError=true;
@@ -179,6 +198,8 @@ function validarActualizacionMateriaConCreditos(){
    
     if(!huboError){
         actualizarMateriaConCreditos();
+    }else{
+        console.log("Hubo algún error.")
     }
 
 }

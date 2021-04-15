@@ -487,29 +487,5 @@ function tutorialVisto() {
 
 };
 
-//Reparar usuarios con mayusculas en el mail
-function repararUsuariosConMayuscula(usuarioConMayuscula) {
-  console.log("El usuario a reprar es: " + usuarioConMayuscula);
-  var baseDeDatos = firebase.firestore();
-  var refUsuario = baseDeDatos.collection("Usuarios").doc(usuarioConMayuscula);
-  var usuarioEnMinuscula = usuarioConMayuscula.toLowerCase();
-  refUsuario.get()
-    .then(function (doc) {
-      var data = doc.data();
-      baseDeDatos.collection("Usuarios").doc(usuarioEnMinuscula).set(data)
-        .then(function () {
-          console.log("Se creo al usuario: " + usuarioEnMinuscula);
-          baseDeDatos.collection("Usuarios").doc(usuarioConMayuscula).delete().then(() => {
-            console.log("Se borró al usuario: " + usuarioConMayuscula);
-          }).catch((error) => {
-            console.error("Error removing document: ", error);
-          });
-        });
-    })
-    .catch(function (error) {
-      console.log("Error getting documents: ", error);
-    });
-
-}
 
 
