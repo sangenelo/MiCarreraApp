@@ -189,8 +189,8 @@ function guardarCarrera() {
                                                     });
                                                 });
                                                 console.log(materiasDeLaCarreraElegida);
-                                                console.log("Los creditos que se analizan son: " + creditos);
-                                                if (creditos != 0) {
+                                                console.log("Los creditos que se analizan son: " + creditos[0]);
+                                                if (creditos[0] != 0) {
                                                     var carreraNueva = {
                                                         materiasAprobadas: [],
                                                         progreso: 0,
@@ -202,9 +202,10 @@ function guardarCarrera() {
                                                         materiasPendientes: materiasDeLaCarreraElegida,
                                                         promedio: 0,
                                                         universidad: universidad,
-                                                        creditosNecesarios: creditos,
+                                                        creditosNecesarios: creditos[0],
                                                         creditosObtenidos: 0,
-                                                        materiasConCreditos: []
+                                                        materiasConCreditos: [],
+                                                        requiereHoras: creditos[1]
                                                     }
                                                 } else {
                                                     var carreraNueva = {
@@ -326,10 +327,19 @@ async function getSiRequiereCreditos(idCarrera) {
     return refCarreras.get()
         .then(function (doc) {
             if (typeof doc.data().creditosNecesarios !== 'undefined') {
-                console.log("La carrera elegida tiene " + doc.data().creditosNecesarios + " creditos necesarios.")
-                return doc.data().creditosNecesarios;
+                console.log("La carrera elegida tiene " + doc.data().creditosNecesarios + " creditos necesarios.");
+                var respuesta;
+                if(typeof doc.data().requiereHoras !== 'undefined'){
+                    respuesta = [doc.data().creditosNecesarios,doc.data().requiereHoras]; 
+                }else{
+                    respuesta = [doc.data().creditosNecesarios,null];
+                }
+                //var respuesta = [doc.data().creditosNecesarios,doc.data().requiereHoras];
+                //return doc.data().creditosNecesarios;
+                return respuesta;
             } else {
-                return 0;
+                var respuesta = [0,false];
+                return respuesta;
             }
 
         })
@@ -382,17 +392,28 @@ function cargarPorcentajeCarrera(idCarrera) {
                     textoTooltip += "Para recibirte te falta";
                     var textoY = "";
                     var cantidadMateriasQueFaltan = cantidadPendientes + cantidadRegulares;
+                    var seRecibio = true;
                     if (cantidadMateriasQueFaltan > 0) {
+                        seRecibio = false;
                         textoTooltip += " aprobar " + cantidadMateriasQueFaltan + " materia/s";
                         textoY = " y";
                     }
 
                     if (typeof doc.data().carreras[i].creditosNecesarios !== 'undefined') {
                         if (doc.data().carreras[i].creditosObtenidos < doc.data().carreras[i].creditosNecesarios) {
+                            var creditosUHoras = "créditos";
+                            if(typeof doc.data().carreras[i].requiereHoras !== 'undefined' && doc.data().carreras[i].requiereHoras){
+                                creditosUHoras="horas de electivas"
+                            }
+                            seRecibio=false;
                             textoTooltip += textoY;
-                            textoTooltip += " sumar " + (doc.data().carreras[i].creditosNecesarios - doc.data().carreras[i].creditosObtenidos) + " créditos"
+                            textoTooltip += " sumar " + (doc.data().carreras[i].creditosNecesarios - doc.data().carreras[i].creditosObtenidos) + " "+creditosUHoras;
                         }
                     }
+                    if(seRecibio){
+                        textoTooltip="¡Te recibiste! Felicitaciones :)"
+                    }
+                    
                     textoTooltip += ".";
                     var progresoTooltip = app.tooltip.create({
                         targetEl: '#progresoAyuda',
@@ -1151,9 +1172,6 @@ function generarTabsListadoMaterias() {
                     var indice = i;
                 }
             }
-            /*if(doc.data().carreras[indice].materiasAprobadas.length!=0) {
-                $$("#listadoMateriasTabs").append("<a href='#tab-aprobadas' class='tab-link tab-link-active tabListadoMateria'>Aprobadas</a>");
-            }*/
             //Siempre muestro la de materias aprobadas.
             $$("#listadoMateriasTabs").append("<a href='#tab-aprobadas' class='tab-link tab-link-active tabListadoMateria'>Aprobadas</a>");
             if (typeof doc.data().carreras[indice].materiasRegulares !== 'undefined') {
@@ -1172,7 +1190,11 @@ function generarTabsListadoMaterias() {
 
             }
             if (typeof doc.data().carreras[indice].creditosNecesarios !== 'undefined') {
-                $$("#listadoMateriasTabs").append("<a href='#tab-creditos' class='tab-link tabListadoMateria'>Créditos</a>");
+                if(typeof doc.data().carreras[indice].requiereHoras !== 'undefined'){
+                    $$("#listadoMateriasTabs").append("<a href='#tab-creditos' class='tab-link tabListadoMateria'>Electivas</a>");
+                }else{
+                    $$("#listadoMateriasTabs").append("<a href='#tab-creditos' class='tab-link tabListadoMateria'>Créditos</a>");
+                }
                 listarMateriasConCreditos();
             }
             listarMaterias();
@@ -1426,7 +1448,14 @@ function listarMateriasConCreditos() {
                 }
             }
             if (typeof doc.data().carreras[indice].creditosNecesarios !== 'undefined') {
-                $$("#progresoCreditosTexto").text("Sumaste " + doc.data().carreras[indice].creditosObtenidos + "/" + doc.data().carreras[indice].creditosNecesarios + " créditos.");
+                var creditosUHoras = "créditos";
+                if (typeof doc.data().carreras[indice].requiereHoras !== 'undefined' && doc.data().carreras[indice].requiereHoras){
+                    creditosUHoras = "horas";
+                    $$("#materiasConCreditosTitulo").text("Materias electivas");
+                    $$("#botonAgregarMateriaConCreditos").text("Agregar materia electiva");
+                    $$("#linkAgregarMateriaConCreditos").attr("href","/agregarMateriaConCreditos/h/");
+                }
+                $$("#progresoCreditosTexto").text("Sumaste " + doc.data().carreras[indice].creditosObtenidos + "/" + doc.data().carreras[indice].creditosNecesarios + " "+creditosUHoras+".");
                 var porcentajeDeCreditos = (doc.data().carreras[indice].creditosObtenidos * 100) / doc.data().carreras[indice].creditosNecesarios;
                 app.progressbar.set("#progresoCreditos", porcentajeDeCreditos, 700);
                 for (var j = 0; j < doc.data().carreras[indice].materiasConCreditos.length; j++) {
@@ -1434,7 +1463,7 @@ function listarMateriasConCreditos() {
                     if (notaMateriaConCredito == -1) {
                         notaMateriaConCredito = "Aprobado";
                     }
-                    $$('#listaMateriasConCreditos').append('<li><a href="/materiaConCreditos/' + doc.data().carreras[indice].materiasConCreditos[j].idMateria + '/' + doc.data().carreras[indice].materiasConCreditos[j].nombreMateria + '/' + doc.data().carreras[indice].materiasConCreditos[j].nota + '/' + doc.data().carreras[indice].materiasConCreditos[j].fechaAprobacion.toDate() + '/' + doc.data().carreras[indice].materiasConCreditos[j].creditos + '/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasConCreditos[j].nombreMateria + '<div class="item-footer">Nota: ' + notaMateriaConCredito + '<br>Créditos: ' + doc.data().carreras[indice].materiasConCreditos[j].creditos + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
+                    $$('#listaMateriasConCreditos').append('<li><a href="/materiaConCreditos/' + doc.data().carreras[indice].materiasConCreditos[j].idMateria + '/' + doc.data().carreras[indice].materiasConCreditos[j].nombreMateria + '/' + doc.data().carreras[indice].materiasConCreditos[j].nota + '/' + doc.data().carreras[indice].materiasConCreditos[j].fechaAprobacion.toDate() + '/' + doc.data().carreras[indice].materiasConCreditos[j].creditos + "/"+creditosUHoras +'/" class="item-link item-content"><div class="item-inner"><div class="item-title">' + doc.data().carreras[indice].materiasConCreditos[j].nombreMateria + '<div class="item-footer">Nota: ' + notaMateriaConCredito + '<br>'+creditosUHoras+': ' + doc.data().carreras[indice].materiasConCreditos[j].creditos + '</div></div><div class="item-after"><i class="f7-icons">square_pencil</i></div></div></a></li>');
                 }
             }
 

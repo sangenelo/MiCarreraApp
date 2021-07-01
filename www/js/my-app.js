@@ -51,7 +51,7 @@ var app = new Framework7({
       url: 'agregarMateria.html'
     },
     {
-      path: '/agregarMateriaConCreditos/',
+      path: '/agregarMateriaConCreditos/:tipo/',
       url: 'agregarMateriaConCreditos.html'
     },
     {
@@ -71,7 +71,7 @@ var app = new Framework7({
       url: 'materiaRegular.html'
     },
     {
-      path: '/materiaConCreditos/:idMateria/:nombreMateria/:nota/:fecha/:creditos/',
+      path: '/materiaConCreditos/:idMateria/:nombreMateria/:nota/:fecha/:creditos/:tipo/',
       url: 'materiaConCreditos.html'
     },
     {
@@ -360,6 +360,11 @@ $$(document).on('page:init', '.page[data-name="agregarMateria"]', function (e) {
   cargarMateriasPendientesEnAgregarMateria(materiaPasadaPorRuta);
   cargarMateriasEnAgregarFinalDesaprobado(materiaPasadaPorRuta);
   cargarMateriasEnAgregarMateriaRegularizada(materiaPasadaPorRuta);
+
+  /*var smartSelectMateriaAprobada = app.smartSelect.get('#smart-select-materia');
+  console.log(smartSelectMateriaAprobada);
+  */
+
   var calendarDefault = app.calendar.create({
     inputEl: '#demo-calendar-default',
     dateFormat: 'mm/dd/yyyy'
@@ -392,6 +397,15 @@ $$(document).on('page:init', '.page[data-name="agregarMateriaConCreditos"]', fun
     inputEl: '#agregarMateriaConCreditosFechaAprobacion',
     dateFormat: 'mm/dd/yyyy'
   });
+  //Cambiar creditos por horas si la carrera cuenta con horas en vez de creditos
+  var tipoCreditos = app.view.main.router.currentRoute.params.tipo;
+  if(tipoCreditos=='h'){
+    $$("#agregarMateriaConCreditosTitulo").text("Agregar materia electiva");
+    $$("#agregarMateriaConCreditosLabelCreditos").text("Cantidad de horas");
+    $$("#agregarMateriaConCreditosCreditos").attr("placeholder","Cantidad de horas");
+    
+    
+  }
   var tipoDeCalificacionElegida;
   $$('body').on('change', '#agregarMateriaConCreditosCalificacion', function () {
     tipoDeCalificacionElegida = $$('#agregarMateriaConCreditosCalificacion').val();
@@ -538,6 +552,7 @@ $$(document).on('page:beforein', '.page[data-name="materiaConCreditos"]', functi
   var notaMateriaConCreditos = '';
   var fechaMateriaConCreditos = '';
   var creditosMateriaConCreditos = '';
+  var tipoCreditos = '';
 })
 
 $$(document).on('page:init', '.page[data-name="materiaConCreditos"]', function (e) {
@@ -546,6 +561,13 @@ $$(document).on('page:init', '.page[data-name="materiaConCreditos"]', function (
   notaMateriaConCreditos = app.view.main.router.currentRoute.params.nota;
   fechaMateriaConCreditos = app.view.main.router.currentRoute.params.fecha;
   creditosMateriaConCreditos = app.view.main.router.currentRoute.params.creditos;
+  tipoCreditos = app.view.main.router.currentRoute.params.tipo;
+
+  if(tipoCreditos=="horas"){
+    $$("#materiaConCreditosLabelCreditos").text("Cantidad de horas");
+    $$("#materiaConCreditosCreditos").attr("placeholder","Ingrese la cantidad de horas.")
+  }
+  
 
   var calendarDefault = app.calendar.create({
     inputEl: '#materiaConCreditosFecha',

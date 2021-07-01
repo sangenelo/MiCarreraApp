@@ -110,7 +110,7 @@ function validarMateriaConCreditos() {
     }
     
     
-    if(creditos<1 || creditos >100){
+    if(creditos<1){
         $$('#agregarMateriaConCreditosCreditosContenedor').addClass('item-input-with-error-message item-input-invalid');
         huboError=true;
     }else{
@@ -163,28 +163,33 @@ function validarActualizacionMateriaAprobada(){
 function validarActualizacionMateriaConCreditos(){
     var idMateria = $$('#materiaConCreditosIdMateria').val();
     var fechaAprobacion = $$('#materiaConCreditosFecha').val();
-    var tipoDeCalificacion = $$("#agregarMateriaConCreditosCalificacion").val();
+    var tipoDeCalificacion="nota";
     var nota = $$('#materiaConCreditosNota').val();
     var creditos = $$('#materiaConCreditosCreditos').val();
     var huboError=false;
+
+    if(nota==-1){
+        tipoDeCalificacion = "aprobado";
+    }
+
 
     if (idMateria.length<1) {
         huboError=true;
     }
     
     if(fechaAprobacion.length<1){
-        $$('#agregarMateriaConCreditosSeleccionarFechaContenedor').addClass('item-input-with-error-message item-input-invalid');
+        $$('#materiaConCreditosSeleccionarFechaContenedor').addClass('item-input-with-error-message item-input-invalid');
         huboError=true;
     }else{
-        $$('#agregarMateriaConCreditosSeleccionarFechaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+        $$('#materiaConCreditosSeleccionarFechaContenedor').removeClass('item-input-with-error-message item-input-invalid');
     }
 
     if(tipoDeCalificacion=="nota"){
         if(nota<4 || nota >10){
-            $$('#agregarMateriaConCreditosNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
+            $$('#materiaConCreditosNotaContenedor').addClass('item-input-with-error-message item-input-invalid');
             huboError=true;
         }else{
-            $$('#agregarMateriaConCreditosNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
+            $$('#materiaConCreditosNotaContenedor').removeClass('item-input-with-error-message item-input-invalid');
         }
     }
     
